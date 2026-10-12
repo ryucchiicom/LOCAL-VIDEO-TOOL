@@ -134,7 +134,6 @@
   const objectURLs = [];
   const CORE_VERSION = '0.12.6';
   const FFMPEG_BASE = `https://cdn.jsdelivr.net/npm/@ffmpeg/core@${CORE_VERSION}/dist/umd`;
-  const FFMPG_PACKAGE_BASE = `https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@${CORE_VERSION}/dist/umd`;
 
   function setStatus(message, kind = '') {
     statusEl.textContent = message;
@@ -384,10 +383,9 @@
     });
     const coreURL = await blobURLFrom(`${FFMPEG_BASE}/ffmpeg-core.js`, 'text/javascript', 0, 2, 'FFmpegコア（JavaScript）');
     const wasmURL = await blobURLFrom(`${FFMPEG_BASE}/ffmpeg-core.wasm`, 'application/wasm', 2, 92, 'FFmpegコア（WebAssembly）');
-    const workerURL = await blobURLFrom(`${FFMPG_PACKAGE_BASE}/814.ffmpeg.js`, 'text/javascript', 92, 96, 'FFmpegワーカー');
     progressBar.style.width = '96%';
-    setStatus('FFmpegエンジンを初期化中… 96%');
-    await ffmpeg.load({ classWorkerURL: workerURL, coreURL, wasmURL });
+    setStatus('FFmpegエンジンを初期化中… 96%（ワーカーを起動中。初回は少し時間がかかることがあるよ）');
+    await ffmpeg.load({ coreURL, wasmURL });
     ffmpegLoaded = true;
     progressBar.style.width = '100%';
     setStatus('FFmpegエンジンの読み込み完了。動画を準備中…', 'good');
