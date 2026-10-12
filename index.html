@@ -314,12 +314,36 @@
   unit.addEventListener('change', () => { amount.step = unit.value === 'frames' ? '1' : 'any'; if (unit.value === 'frames') amount.value = String(Math.max(1, Math.round(Number(amount.value) || 1))); updatePreview(); });
   fpsInput.addEventListener('input', updatePreview);
 
-  async function blobURLFrom(url, mimeType) {
+  async function blobURLFrom(url, mimeType, progressStart = 0, progressEnd = 100, label = 'FFmpegファイル') {
+    setStatus(`${label}をダウンロード中… ${Math.round(progressStart)}%`);
+    progressBar.style.width = `${progressStart}%`;
     const response = await fetch(url);
     if (!response.ok) throw new Error(`読み込み失敗 (${response.status}): ${url}`);
-    const blob = new Blob([await response.arrayBuffer()], { type: mimeType });
+    const total = Number(response.headers.get('content-length')) || 0;
+    let blob;
+    if (response.body && response.body.getReader) {
+      const reader = response.body.getReader();
+      const chunks = [];
+      let received = 0;
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        received += value.byteLength;
+        const ratio = total > 0 ? Math.min(1, received / total) : 0;
+        const percent = progressStart + (progressEnd - progressStart) * ratio;
+        progressBar.style.width = `${percent}%`;
+        setStatus(`${label}をダウンロード中… ${total > 0 ? `${Math.round(received / 1024 / 1024 * 10) / 10} / ${Math.round(total / 1024 / 1024 * 10) / 10} MB` : `${Math.round(received / 1024 / 1024 * 10) / 10} MB受信済み`} · ${Math.round(percent)}%`);
+      }
+      blob = new Blob(chunks, { type: mimeType });
+    } else {
+      const buffer = await response.arrayBuffer();
+      blob = new Blob([buffer], { type: mimeType });
+      progressBar.style.width = `${progressEnd}%`;
+    }
     const blobURL = URL.createObjectURL(blob);
     objectURLs.push(blobURL);
+    progressBar.style.width = `${progressEnd}%`;
     return blobURL;
   }
   async function loadFFmpeg() {
@@ -335,11 +359,13 @@
     ffmpeg.on('progress', ({ progress }) => {
       if (Number.isFinite(progress)) progressBar.style.width = `${Math.max(0, Math.min(100, progress * 100))}%`;
     });
-    const coreURL = await blobURLFrom(`${FFMPEG_BASE}/ffmpeg-core.js`, 'text/javascript');
-    const wasmURL = await blobURLFrom(`${FFMPEG_BASE}/ffmpeg-core.wasm`, 'application/wasm');
-    const workerURL = await blobURLFrom(`${FFMPG_PACKAGE_BASE}/814.ffmpeg.js`, 'text/javascript');
+    const coreURL = await blobURLFrom(`${FFMPEG_BASE}/ffmpeg-core.js`, 'text/javascript', 0, 5, 'FFmpeg JavaScript');
+    const wasmURL = await blobURLFrom(`${FFMPEG_BASE}/ffmpeg-core.wasm`, 'application/wasm', 5, 98, 'FFmpeg本体（WASM）');
+    const workerURL = await blobURLFrom(`${FFMPG_PACKAGE_BASE}/814.ffmpeg.js`, 'text/javascript', 98, 100, 'FFmpeg Worker');
+    setStatus('FFmpegを起動中…');
     await ffmpeg.load({ classWorkerURL: workerURL, coreURL, wasmURL });
     ffmpegLoaded = true;
+    progressBar.style.width = '100%';
   }
   async function writeSelectedSource() {
     if (!selectedFile) throw new Error('先に動画ファイルを選んでね。');
