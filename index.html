@@ -134,6 +134,7 @@
   const objectURLs = [];
   const CORE_VERSION = '0.12.6';
   const FFMPEG_BASE = `https://cdn.jsdelivr.net/npm/@ffmpeg/core@${CORE_VERSION}/dist/umd`;
+  const FFMPG_PACKAGE_BASE = `https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@${CORE_VERSION}/dist/umd`;
 
   function setStatus(message, kind = '') {
     statusEl.textContent = message;
@@ -313,56 +314,51 @@
   unit.addEventListener('change', () => { amount.step = unit.value === 'frames' ? '1' : 'any'; if (unit.value === 'frames') amount.value = String(Math.max(1, Math.round(Number(amount.value) || 1))); updatePreview(); });
   fpsInput.addEventListener('input', updatePreview);
 
-  async function blobURLFrom(url, mimeType, progressStart, progressEnd, label) {
+  async function blobURLFrom(url, mimeType, label, stageStart, stageSpan, estimatedBytes) {
     const response = await fetch(url);
     if (!response.ok) throw new Error(`読み込み失敗 (${response.status}): ${url}`);
-    const contentLength = Number(response.headers.get('content-length'));
-    const total = Number.isFinite(contentLength) && contentLength > 0 ? contentLength : 0;
-    const chunks = [];
-    let loaded = 0;
-    let lastReport = 0;
 
-    function reportProgress(done = false) {
-      const now = Date.now();
-      if (!done && now - lastReport < 100) return;
-      lastReport = now;
-      let ratio;
-      if (done) {
-        ratio = 1;
-      } else if (total > 0) {
-        ratio = Math.min(1, loaded / total);
-      } else {
-        // Content-Lengthが公開されないCDNでも、受信済みバイト数に応じてバーを進める。
-        ratio = Math.min(0.94, 1 - Math.exp(-loaded / (8 * 1024 * 1024)));
-      }
-      const percent = progressStart + (progressEnd - progressStart) * ratio;
-      progressBar.style.width = `${Math.max(0, Math.min(100, percent))}%`;
-      const byteText = total > 0
-        ? `${fmtSize(loaded)} / ${fmtSize(total)}`
-        : `${fmtSize(loaded)} 受信済み（総サイズ取得不可）`;
-      setStatus(`${label}をダウンロード中… ${byteText}`);
-    }
+    const contentLengthHeader = response.headers.get('content-length');
+    const contentLength = contentLengthHeader ? Number(contentLengthHeader) : NaN;
+    const hasContentLength = Number.isFinite(contentLength) && contentLength > 0;
+    const reader = response.body && typeof response.body.getReader === 'function'
+      ? response.body.getReader()
+      : null;
+    let blob;
 
-    if (response.body && typeof response.body.getReader === 'function') {
-      const reader = response.body.getReader();
+    if (reader) {
+      const chunks = [];
+      let receivedBytes = 0;
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        if (value && value.byteLength) {
+        if (value) {
           chunks.push(value);
-          loaded += value.byteLength;
-          reportProgress();
+          receivedBytes += value.byteLength;
         }
+
+        const ratio = hasContentLength
+          ? Math.min(0.995, receivedBytes / contentLength)
+          : Math.min(0.95, receivedBytes / Math.max(1, estimatedBytes));
+        const overallProgress = stageStart + stageSpan * ratio;
+        progressBar.style.width = `${Math.max(0, Math.min(99, overallProgress))}%`;
+        const byteText = hasContentLength
+          ? `${fmtSize(receivedBytes)} / ${fmtSize(contentLength)}`
+          : `${fmtSize(receivedBytes)} 受信済み`;
+        const percentText = hasContentLength
+          ? ` ${Math.min(99, Math.floor(receivedBytes / contentLength * 100))}%`
+          : '';
+        setStatus(`${label}をダウンロード中…${percentText}\n${byteText}`);
       }
+      blob = new Blob(chunks, { type: mimeType });
     } else {
+      setStatus(`${label}をダウンロード中… サイズを取得中`);
       const buffer = await response.arrayBuffer();
-      const chunk = new Uint8Array(buffer);
-      chunks.push(chunk);
-      loaded = chunk.byteLength;
+      blob = new Blob([buffer], { type: mimeType });
     }
 
-    reportProgress(true);
-    const blob = new Blob(chunks, { type: mimeType });
+    progressBar.style.width = `${Math.min(99, stageStart + stageSpan)}%`;
+    setStatus(`${label}のダウンロード完了（${fmtSize(blob.size)}）`);
     const blobURL = URL.createObjectURL(blob);
     objectURLs.push(blobURL);
     return blobURL;
@@ -381,14 +377,14 @@
     ffmpeg.on('progress', ({ progress }) => {
       if (Number.isFinite(progress)) progressBar.style.width = `${Math.max(0, Math.min(100, progress * 100))}%`;
     });
-    const coreURL = await blobURLFrom(`${FFMPEG_BASE}/ffmpeg-core.js`, 'text/javascript', 0, 2, 'FFmpegコア（JavaScript）');
-    const wasmURL = await blobURLFrom(`${FFMPEG_BASE}/ffmpeg-core.wasm`, 'application/wasm', 2, 92, 'FFmpegコア（WebAssembly）');
-    progressBar.style.width = '96%';
-    setStatus('FFmpegエンジンを初期化中… 96%（ワーカーを起動中。初回は少し時間がかかることがあるよ）');
-    await ffmpeg.load({ coreURL, wasmURL });
+    const coreURL = await blobURLFrom(`${FFMPEG_BASE}/ffmpeg-core.js`, 'text/javascript', 'FFmpeg core JS', 0, 2, 250 * 1024);
+    const wasmURL = await blobURLFrom(`${FFMPEG_BASE}/ffmpeg-core.wasm`, 'application/wasm', 'FFmpeg WASM本体', 2, 95, 32 * 1024 * 1024);
+    const workerURL = await blobURLFrom(`${FFMPG_PACKAGE_BASE}/814.ffmpeg.js`, 'text/javascript', 'FFmpeg worker', 97, 2, 100 * 1024);
+    setStatus('FFmpeg本体を初期化中…');
+    progressBar.style.width = '99%';
+    await ffmpeg.load({ classWorkerURL: workerURL, coreURL, wasmURL });
     ffmpegLoaded = true;
     progressBar.style.width = '100%';
-    setStatus('FFmpegエンジンの読み込み完了。動画を準備中…', 'good');
   }
   async function writeSelectedSource() {
     if (!selectedFile) throw new Error('先に動画ファイルを選んでね。');
