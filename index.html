@@ -86,7 +86,8 @@
   .logo{width:34px;height:34px;min-width:34px;border-radius:11px;font-size:18px}
   h1{font-size:clamp(15px,2.2vw,21px);letter-spacing:-.025em;white-space:nowrap}
   .sub{font-size:10px;margin:2px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46vw}
-  .header-file-area{display:flex;align-items:center;justify-content:flex-end;gap:7px;min-width:0;max-width:55%}
+  .header-file-area{display:flex;align-items:center;justify-content:flex-end;gap:7px;min-width:0;max-width:55%;margin-left:auto}
+  #fileMeta{display:none!important}
   #dropzone{display:flex;align-items:center;justify-content:center;gap:6px;flex:none;width:auto;max-width:180px;padding:8px 11px;border-style:solid;border-radius:11px;text-align:center;font-size:12px;white-space:nowrap}
   #dropzone .file-icon{display:none}
   #dropzone strong{display:inline;font-size:12px;margin:0}
@@ -100,6 +101,9 @@
   .section-title{font-size:13px;margin:0 0 7px;gap:7px;line-height:1.2}
   .step{width:21px;height:21px;border-radius:7px;font-size:11px}
   .preview-shell{flex:1;min-height:0;width:100%;aspect-ratio:auto;border-radius:10px}
+  .preview-shell.empty-pick{cursor:pointer}
+  .preview-shell.drag{outline:2px dashed var(--cyan);outline-offset:-6px;background:#10272b}
+  .preview-shell.drag::after{content:"ここにドロップして動画を差し替え";position:absolute;inset:12px;display:grid;place-items:center;background:#07121be8;border:1px solid #62e4dc99;border-radius:10px;color:#b2fff5;font-size:clamp(12px,2vw,18px);font-weight:800;pointer-events:none;text-align:center}
   video,#previewImage{width:100%;height:100%;max-height:none;object-fit:contain}
   .preview-footer{padding-top:5px;gap:8px;align-items:center;flex-wrap:nowrap;min-height:22px}
   .preview-footer .small{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -228,10 +232,10 @@
 
   <section class="panel preview-panel" id="previewPanel">
     <h2 class="section-title"><span class="step">1</span>プレビュー</h2>
-    <div class="preview-shell">
+    <div class="preview-shell empty-pick" id="previewShell" role="button" tabindex="0" aria-label="タップして動画を選択。動画をドラッグ＆ドロップすると差し替え">
       <video id="previewVideo" controls playsinline hidden></video>
       <img id="previewImage" alt="切り抜き位置のプレビュー" hidden>
-      <div id="previewEmpty" class="preview-empty">上の「動画を選択」から動画を読み込んでね。</div>
+      <div id="previewEmpty" class="preview-empty">タップして動画を選択<br>または動画をドラッグ＆ドロップ</div>
     </div>
     <div class="preview-footer">
       <span id="previewMeaning" class="muted small">プレビュー位置：未選択</span>
@@ -337,7 +341,7 @@ const $ = (id) => document.getElementById(id);
 const els = {
   dropzone:$('dropzone'), fileInput:$('fileInput'), fileMeta:$('fileMeta'), fileName:$('fileName'), fileInfo:$('fileInfo'), fileStatus:$('fileStatus'),
   progressWrap:$('progressWrap'), progressLabel:$('progressLabel'), progressPercent:$('progressPercent'), progressFill:$('progressFill'), progressDetail:$('progressDetail'),
-  video:$('previewVideo'), image:$('previewImage'), previewEmpty:$('previewEmpty'), previewMeaning:$('previewMeaning'), previewTime:$('previewTime'), previewNote:$('previewNote'),
+  video:$('previewVideo'), image:$('previewImage'), previewShell:$('previewShell'), previewEmpty:$('previewEmpty'), previewMeaning:$('previewMeaning'), previewTime:$('previewTime'), previewNote:$('previewNote'),
   fromStart:$('fromStart'), fromEnd:$('fromEnd'), amount:$('amount'), unit:$('unit'), fpsBox:$('fpsBox'), fpsInput:$('fpsInput'), fpsStatus:$('fpsStatus'),
   cutSummary:$('cutSummary'), cutButton:$('cutButton'), resetButton:$('resetButton'), result:$('result'),
   amountSlider:$('amountSlider'), sliderMaxLabel:$('sliderMaxLabel'),
@@ -843,6 +847,16 @@ async function ensureEngine() {
   }
   throw new Error(`処理エンジンを読み込めなかったよ。ネット接続を確認して再試行してね。\n${failures.join('\n')}`);
 }
+function updatePreviewPickState() {
+  const empty = !currentFile;
+  els.previewShell.classList.toggle('empty-pick', empty);
+  els.previewShell.setAttribute('role', empty ? 'button' : 'group');
+  els.previewShell.setAttribute('tabindex', empty ? '0' : '-1');
+  els.previewShell.setAttribute('aria-label', empty
+    ? 'タップして動画を選択。動画をドラッグ＆ドロップすると差し替え'
+    : 'プレビュー。動画をドラッグ＆ドロップすると差し替え');
+}
+
 async function loadSelectedFile(file) {
   if (!file) return;
   const previousInputName = currentInputName;
@@ -851,6 +865,7 @@ async function loadSelectedFile(file) {
     return;
   }
   currentFile = file;
+  updatePreviewPickState();
   currentExt = extFromName(file.name);
   currentInputName = `input_media.${currentExt}`;
   sourceDuration = NaN;
@@ -1191,6 +1206,7 @@ async function performCut() {
 function resetAll() {
   if (busy) return;
   currentFile = null;
+  updatePreviewPickState();
   sourceDuration = NaN;
   parsedFPS = NaN;
   currentInputName = '';
@@ -1210,7 +1226,7 @@ function resetAll() {
   els.video.hidden = true;
   els.image.hidden = true;
   els.previewEmpty.hidden = false;
-  els.previewEmpty.textContent = '動画を選ぶと、切り抜き位置のフレームをここに表示するよ。';
+  els.previewEmpty.innerHTML = 'タップして動画を選択<br>または動画をドラッグ＆ドロップ';
   els.fromStart.classList.add('active'); els.fromEnd.classList.remove('active');
   els.fromStart.setAttribute('aria-pressed','true'); els.fromEnd.setAttribute('aria-pressed','false');
   els.amount.value = '10'; els.unit.value = 'seconds'; els.fpsInput.value = '30'; els.outputMode.value = 'download'; userChangedFPS = false;
@@ -1234,12 +1250,40 @@ function resetAll() {
 
 restoreSettings();
 syncAmountSlider(true);
+updatePreviewPickState();
 els.dropzone.addEventListener('click', () => els.fileInput.click());
 els.dropzone.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); els.fileInput.click(); } });
 els.fileInput.addEventListener('change', e => { const file = e.target.files && e.target.files[0]; if (file) loadSelectedFile(file); });
 els.dropzone.addEventListener('dragover', e => { e.preventDefault(); els.dropzone.classList.add('drag'); });
 els.dropzone.addEventListener('dragleave', () => els.dropzone.classList.remove('drag'));
 els.dropzone.addEventListener('drop', e => { e.preventDefault(); els.dropzone.classList.remove('drag'); const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (file) loadSelectedFile(file); });
+els.previewShell.addEventListener('click', e => {
+  if (currentFile) return;
+  if (e.target.closest('video')) return;
+  els.fileInput.click();
+});
+els.previewShell.addEventListener('keydown', e => {
+  if (currentFile) return;
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    els.fileInput.click();
+  }
+});
+els.previewShell.addEventListener('dragover', e => {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'copy';
+  els.previewShell.classList.add('drag');
+});
+els.previewShell.addEventListener('dragleave', e => {
+  if (!els.previewShell.contains(e.relatedTarget)) els.previewShell.classList.remove('drag');
+});
+els.previewShell.addEventListener('drop', e => {
+  e.preventDefault();
+  e.stopPropagation();
+  els.previewShell.classList.remove('drag');
+  const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+  if (file) loadSelectedFile(file);
+});
 els.fromStart.addEventListener('click', () => { selectedSide='start'; els.fromStart.classList.add('active'); els.fromEnd.classList.remove('active'); els.fromStart.setAttribute('aria-pressed','true'); els.fromEnd.setAttribute('aria-pressed','false'); saveSettings(); schedulePreview(); });
 els.fromEnd.addEventListener('click', () => { selectedSide='end'; els.fromEnd.classList.add('active'); els.fromStart.classList.remove('active'); els.fromEnd.setAttribute('aria-pressed','true'); els.fromStart.setAttribute('aria-pressed','false'); saveSettings(); schedulePreview(); });
 els.amount.addEventListener('input', () => { syncAmountSlider(true); saveSettings(); schedulePreview(); });
