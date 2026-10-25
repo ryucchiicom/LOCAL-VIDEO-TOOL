@@ -1097,8 +1097,12 @@ function renderOutputResult(filename, blob, outputURL) {
     triggerDownload(blob, filename);
     els.result.innerHTML = `<strong style="color:var(--ok)">✓ 切り抜き完了！</strong><div>${escapeHTML(filename)}（${humanSize(blob.size)}）</div>${linkHTML}`;
   } else if (mode === 'share') {
-    els.result.innerHTML = `<strong style="color:var(--ok)">✓ 切り抜き完了！</strong><div>${escapeHTML(filename)}（${humanSize(blob.size)}）</div><button id="shareOutputButton" class="secondary" type="button">共有シートを開く</button>${linkHTML}`;
+    els.result.innerHTML = `<strong style="color:var(--ok)">✓ 切り抜き完了！</strong><div>${escapeHTML(filename)}（${humanSize(blob.size)}）</div><button id="shareOutputButton" class="secondary" type="button">共有シートを開く（自動で開かない場合）</button>${linkHTML}`;
     $('shareOutputButton').addEventListener('click', shareCurrentOutput);
+    // Try to open the native share sheet immediately when output generation finishes.
+    // Some browsers require a fresh user gesture and may reject this automatic attempt;
+    // shareCurrentOutput then leaves the manual share/save fallback visible.
+    void shareCurrentOutput();
   } else {
     els.result.innerHTML = `<strong style="color:var(--ok)">✓ 切り抜き完了！</strong><div>${escapeHTML(filename)}（${humanSize(blob.size)}）</div><button id="quicklookOutputButton" class="secondary" type="button">クイックルックで開く</button>${linkHTML}`;
     $('quicklookOutputButton').addEventListener('click', openQuickLook);
