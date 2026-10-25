@@ -74,66 +74,172 @@
   footer{color:#78869a;font-size:11px;text-align:center;margin-top:25px}
   [hidden]{display:none!important}
   @media(max-width:760px){.wrap{padding:20px 12px 32px}.panel{padding:15px}.grid{grid-template-columns:1fr}.preview-shell{min-height:0}.preview-footer{align-items:flex-start}.fields{grid-template-columns:minmax(0,1fr) minmax(105px,.75fr)}}
+
+  /* Full-screen, no-page-scroll workspace */
+  html,body{width:100%;height:100%;min-height:0;overflow:hidden;overscroll-behavior:none}
+  body{min-height:0}
+  .wrap{width:100%;max-width:none;height:100vh;height:100dvh;margin:0;padding:max(7px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(7px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));display:grid;grid-template-rows:auto minmax(0,1.12fr) minmax(0,1fr) auto;gap:8px;overflow:hidden}
+  .app-header{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0;margin:0;min-height:40px}
+  .brand{display:flex;align-items:center;gap:9px;min-width:0}
+  .brand-copy{min-width:0}
+  .logo{width:34px;height:34px;min-width:34px;border-radius:11px;font-size:18px}
+  h1{font-size:clamp(15px,2.2vw,21px);letter-spacing:-.025em;white-space:nowrap}
+  .sub{font-size:10px;margin:2px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46vw}
+  .header-file-area{display:flex;align-items:center;justify-content:flex-end;gap:7px;min-width:0;max-width:55%}
+  #dropzone{display:flex;align-items:center;justify-content:center;gap:6px;flex:none;width:auto;max-width:180px;padding:8px 11px;border-style:solid;border-radius:11px;text-align:center;font-size:12px;white-space:nowrap}
+  #dropzone .file-icon{display:none}
+  #dropzone strong{display:inline;font-size:12px;margin:0}
+  #dropzone p{display:none}
+  .file-meta{margin:0;max-width:min(270px,30vw);min-width:0;padding:6px 8px;gap:7px;border-radius:10px}
+  .file-name{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px}
+  .file-meta .tag{font-size:9px;padding:2px 6px}
+  .file-info{white-space:nowrap}
+  .panel{margin:0;padding:clamp(8px,1.35vh,13px);min-height:0;border-radius:14px;overflow:hidden;box-shadow:0 7px 20px #00000012}
+  .preview-panel{display:flex;flex-direction:column;gap:0}
+  .section-title{font-size:13px;margin:0 0 7px;gap:7px;line-height:1.2}
+  .step{width:21px;height:21px;border-radius:7px;font-size:11px}
+  .preview-shell{flex:1;min-height:0;width:100%;aspect-ratio:auto;border-radius:10px}
+  video,#previewImage{width:100%;height:100%;max-height:none;object-fit:contain}
+  .preview-footer{padding-top:5px;gap:8px;align-items:center;flex-wrap:nowrap;min-height:22px}
+  .preview-footer .small{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .preview-time{font-size:12px;flex:none}
+  #previewNote{display:none!important}
+  .settings-panel{display:flex;flex-direction:column;min-height:0}
+  .settings-layout{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);gap:12px;flex:1;min-height:0}
+  .settings-left,.settings-right{display:flex;flex-direction:column;gap:8px;min-width:0;min-height:0}
+  .control-block{min-width:0}
+  .label{font-size:11px;margin-bottom:5px}
+  .segmented{gap:6px}
+  .choice{padding:8px 7px;border-radius:9px;font-size:11px;line-height:1.25}
+  .fields{grid-template-columns:minmax(0,1fr) minmax(105px,.8fr);gap:7px}
+  input[type=number],select{padding:8px 9px;border-radius:9px;font-size:12px;min-height:35px}
+  .fps-box{padding:8px;border-radius:9px}
+  .fps-inner{gap:7px}
+  .fps-inner input{max-width:110px}
+  .fps-box .small{font-size:10px}
+  .summary{padding:8px 9px;border-radius:9px;font-size:11px;line-height:1.35;min-height:0}
+  .summary strong{font-size:11px}
+  .save-settings{border:1px solid var(--line);background:#0d141e;border-radius:10px;padding:9px;min-width:0}
+  .save-settings h3{font-size:11px;margin:0 0 6px;color:#cfdaea}
+  .save-settings select{width:100%}
+  .save-settings .small{display:none}
+  .action{gap:7px}
+  .primary{min-width:0;border-radius:10px;padding:10px 12px;font-size:13px}
+  .secondary{border-radius:9px;padding:8px 10px;font-size:11px}
+  .progress-wrap{margin-top:7px;flex:none}
+  .progress-head{font-size:10px;margin-bottom:4px}
+  .progress-track{height:6px}
+  .progress-detail{font-size:10px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .result{margin-top:6px;padding:7px 9px;border-radius:9px;font-size:11px;max-height:72px;overflow:auto;flex:none}
+  .result button{font-size:11px;padding:6px 8px;margin-top:5px}
+  .result a{font-size:11px}
+  .bottom-actions{display:flex;align-items:center;gap:8px;min-height:44px}
+  #resetButton{flex:none;min-width:0}
+  #cutButton{flex:1;min-width:0;height:44px;padding:8px 12px;border-radius:12px;font-size:14px}
+  .info-button{width:42px;height:42px;flex:none;border:1px solid #40516a;border-radius:50%;background:#152032;color:#dce9fb;font-weight:800;font-size:19px;display:grid;place-items:center;padding:0}
+  .info-overlay{position:fixed;z-index:1000;inset:0;background:#03060bd9;display:flex;align-items:center;justify-content:center;padding:18px;padding-bottom:max(18px,env(safe-area-inset-bottom));}
+  .info-dialog{width:min(560px,100%);max-height:min(82dvh,720px);overflow:auto;background:#111a27;border:1px solid #34445b;border-radius:18px;padding:17px;box-shadow:0 22px 70px #0009}
+  .info-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+  .info-head h2{font-size:16px;margin:0}
+  .info-close{width:32px;height:32px;border:1px solid #35445b;border-radius:50%;background:#1a2637;color:#edf3fc;font-size:18px}
+  .info-dialog .notice{margin:9px 0;font-size:12px}
+  .info-dialog p{font-size:12px;color:#bdcbe0;margin:8px 0}
+  .info-dialog ul{padding-left:18px;margin:8px 0;color:#bdcbe0;font-size:12px}
+  .info-dialog li{margin:5px 0}
+  [hidden]{display:none!important}
+  @media(max-width:600px){
+    .wrap{grid-template-rows:auto minmax(0,1.04fr) minmax(0,1fr) auto;gap:6px}
+    .app-header{gap:5px;min-height:34px}
+    .brand{gap:6px}
+    .logo{width:29px;height:29px;min-width:29px;font-size:16px;border-radius:9px}
+    h1{font-size:14px}
+    .sub{display:none}
+    .header-file-area{max-width:55%;gap:5px}
+    #dropzone{padding:7px 8px;font-size:10px;max-width:140px}
+    #dropzone strong{font-size:10px}
+    .file-meta{max-width:35vw;padding:5px 6px}
+    .file-name{max-width:25vw;font-size:10px}
+    .file-meta .tag{display:none}
+    .settings-layout{grid-template-columns:minmax(0,1fr) minmax(0,.82fr);gap:7px}
+    .settings-left,.settings-right{gap:7px}
+    .panel{padding:8px}
+    .section-title{font-size:12px;margin-bottom:6px}
+    .choice{font-size:10px;padding:8px 4px}
+    .save-settings{padding:7px}
+    .save-settings h3{font-size:10px}
+    .summary{font-size:10px;padding:7px}
+    .bottom-actions{gap:6px;min-height:40px}
+    #cutButton{height:40px;font-size:13px}
+    #resetButton{padding:7px 8px}
+    .info-button{height:38px;width:38px;font-size:17px}
+  }
+  @media(max-height:650px){
+    .wrap{grid-template-rows:auto minmax(0,.82fr) minmax(0,1.18fr) auto;gap:5px;padding-top:max(4px,env(safe-area-inset-top));padding-bottom:max(4px,env(safe-area-inset-bottom))}
+    .app-header{min-height:29px}
+    .logo{width:27px;height:27px;min-width:27px}
+    .panel{padding:6px}
+    .section-title{margin-bottom:4px}
+    .settings-layout{gap:6px}
+    .settings-left,.settings-right{gap:5px}
+    .choice{padding:6px 4px}
+    .fields input,.fields select{min-height:30px;padding:5px 7px}
+    .save-settings{padding:6px}
+    #cutButton{height:36px}
+    .info-button{height:34px;width:34px}
+  }
+  @media(max-width:380px){.file-info{display:none}.settings-layout{grid-template-columns:minmax(0,1fr) minmax(0,.78fr)}.file-name{max-width:22vw}}
+
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <div class="logo" aria-hidden="true">✂</div>
-    <div>
-      <h1>劣化なし動画カット</h1>
-      <p class="sub">最初から／最後から、指定した長さだけ切り出す。再エンコードなし。</p>
+  <header class="app-header">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">✂</div>
+      <div class="brand-copy">
+        <h1>劣化なし動画カット</h1>
+        <p class="sub">再エンコードなしで切り抜き</p>
+      </div>
+    </div>
+    <div class="header-file-area">
+      <div id="dropzone" class="dropzone" role="button" tabindex="0" aria-label="動画ファイルを選ぶ">
+        <span aria-hidden="true">＋</span><strong>動画を選択</strong>
+        <input id="fileInput" type="file" accept="video/*,.mp4,.mov,.mkv,.webm,.avi,.m4v,.wmv,.flv,.mpeg,.mpg,.ts,.mts,.m2ts,.3gp,.ogv,.vob" hidden>
+      </div>
+      <div id="fileMeta" class="file-meta">
+        <div style="min-width:0"><div id="fileName" class="file-name"></div><div id="fileInfo" class="muted small file-info"></div></div>
+        <span id="fileStatus" class="tag"><span class="status-dot"></span>準備中</span>
+      </div>
     </div>
   </header>
 
-  <section class="panel">
-    <h2 class="section-title"><span class="step">1</span>動画ファイルを選ぶ</h2>
-    <div id="dropzone" class="dropzone" role="button" tabindex="0" aria-label="動画ファイルを選ぶ">
-      <div class="file-icon">▤</div>
-      <strong>ここに動画をドラッグ＆ドロップ</strong>
-      <p>またはタップ／クリックしてファイルを選択</p>
-      <p class="small" style="margin-top:10px">MP4 / MOV / MKV / WEBM / AVI / M4V / WMV / FLV / MPEG / TS / 3GP など</p>
-      <input id="fileInput" type="file" accept="video/*,.mp4,.mov,.mkv,.webm,.avi,.m4v,.wmv,.flv,.mpeg,.mpg,.ts,.mts,.m2ts,.3gp,.ogv,.vob" hidden>
+  <section class="panel preview-panel" id="previewPanel">
+    <h2 class="section-title"><span class="step">1</span>プレビュー</h2>
+    <div class="preview-shell">
+      <video id="previewVideo" controls playsinline hidden></video>
+      <img id="previewImage" alt="切り抜き位置のプレビュー" hidden>
+      <div id="previewEmpty" class="preview-empty">上の「動画を選択」から動画を読み込んでね。</div>
     </div>
-    <div id="fileMeta" class="file-meta">
-      <div style="min-width:0"><div id="fileName" class="file-name"></div><div id="fileInfo" class="muted small"></div></div>
-      <span id="fileStatus" class="tag"><span class="status-dot"></span>準備中</span>
+    <div class="preview-footer">
+      <span id="previewMeaning" class="muted small">プレビュー位置：未選択</span>
+      <span id="previewTime" class="preview-time">00:00:00.000</span>
     </div>
-    <div id="progressWrap" class="progress-wrap" aria-live="polite">
-      <div class="progress-head"><span id="progressLabel">準備中…</span><strong id="progressPercent">0%</strong></div>
-      <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
-      <div id="progressDetail" class="muted small" style="margin-top:6px"></div>
-    </div>
-    <div class="notice privacy">動画ファイル自体は外部サーバーへアップロードせず、このブラウザ内で処理するよ。初回は処理エンジン（約31MB）をネットから読み込む必要あり。</div>
+    <div id="previewNote" class="muted small" style="margin-top:7px">フレーム単位の位置はFPSを基に計算するよ。</div>
   </section>
 
-  <div class="grid">
-    <section class="panel">
-      <h2 class="section-title"><span class="step">2</span>切り抜き位置をプレビュー</h2>
-      <div class="preview-shell">
-        <video id="previewVideo" controls playsinline hidden></video>
-        <img id="previewImage" alt="切り抜き位置のプレビュー" hidden>
-        <div id="previewEmpty" class="preview-empty">動画を選ぶと、切り抜き位置のフレームをここに表示するよ。</div>
-      </div>
-      <div class="preview-footer">
-        <span id="previewMeaning" class="muted small">プレビュー位置：未選択</span>
-        <span id="previewTime" class="preview-time">00:00:00.000</span>
-      </div>
-      <div id="previewNote" class="muted small" style="margin-top:7px">フレーム単位の位置はFPSを基に計算するよ。</div>
-    </section>
-
-    <section class="panel">
-      <h2 class="section-title"><span class="step">3</span>切り抜き範囲を指定</h2>
-      <div class="controls">
-        <div>
-          <span class="label">どちら側から切り出す？</span>
+  <section class="panel settings-panel" id="settingsPanel">
+    <h2 class="section-title"><span class="step">2</span>設定</h2>
+    <div class="settings-layout">
+      <div class="settings-left">
+        <div class="control-block">
+          <span class="label">切り出す方向</span>
           <div class="segmented">
             <button type="button" id="fromStart" class="choice active" aria-pressed="true">◀ 最初から</button>
             <button type="button" id="fromEnd" class="choice" aria-pressed="false">最後から ▶</button>
           </div>
         </div>
-        <div>
-          <span class="label" for="amount">切り出す長さ</span>
+        <div class="control-block">
+          <label class="label" for="amount">切り出す長さ</label>
           <div class="fields">
             <input id="amount" type="number" min="1" step="1" value="10" inputmode="decimal" aria-label="切り出す長さ">
             <select id="unit" aria-label="長さの単位">
@@ -147,25 +253,50 @@
         <div id="fpsBox" class="fps-box">
           <label class="label" for="fpsInput">フレームレート（FPS）</label>
           <div class="fps-inner"><input id="fpsInput" type="number" min="0.001" max="1000" step="any" value="30" inputmode="decimal"><span id="fpsStatus" class="muted small">未解析（仮に30 FPS）</span></div>
-          <div class="muted small" style="margin-top:7px">自動判定が合わない場合はここを修正してね。可変フレームレート動画ではフレーム指定が概算になる場合あり。</div>
+          <div class="muted small" style="margin-top:5px">自動判定が合わない場合のみ修正してね。</div>
         </div>
         <div id="cutSummary" class="summary">動画を選ぶと、切り抜く範囲を表示するよ。</div>
-        <div class="action">
-          <button id="cutButton" class="primary" type="button" disabled>✂ 劣化なしで切り抜く</button>
-          <button id="resetButton" class="secondary" type="button">リセット</button>
-        </div>
-        <div class="muted small">出力は元ファイルと同じコンテナ形式・拡張子。映像・音声を再エンコードせずにコピーするため速く、再圧縮による劣化がないよ。</div>
       </div>
-      <div id="result" class="result" role="status"></div>
-    </section>
-  </div>
-
-  <section class="panel">
-    <h2 class="section-title"><span class="step">!</span>「劣化なし」についての大事な注意</h2>
-    <div class="notice">再エンコードしないので映像・音声そのものは再圧縮されないけど、動画の開始位置は<strong>キーフレーム</strong>の位置に影響される場合があり、指定フレームぴったりにならないことがあるよ。どんな動画でも「完全なフレーム精度」と「再エンコードなし」を同時に保証することはできない仕様なんだ。</div>
-    <p class="muted small" style="margin:12px 0 0">ブラウザのメモリ上限により、非常に大きなファイルは処理できない場合があるよ。処理に失敗したら、より小さいファイルやPCのブラウザで試してね。</p>
+      <div class="settings-right">
+        <div class="save-settings">
+          <h3>保存などの設定</h3>
+          <select id="outputMode" aria-label="保存方法">
+            <option value="download">通常ダウンロード</option>
+            <option value="share">共有</option>
+            <option value="quicklook">クイックルック</option>
+          </select>
+        </div>
+        <div id="progressWrap" class="progress-wrap" aria-live="polite">
+          <div class="progress-head"><span id="progressLabel">準備中…</span><strong id="progressPercent">0%</strong></div>
+          <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
+          <div id="progressDetail" class="muted small progress-detail" style="margin-top:5px"></div>
+        </div>
+        <div id="result" class="result" role="status"></div>
+      </div>
+    </div>
   </section>
-  <footer>ローカル動画カッター · FFmpeg.wasm · インターネット接続が必要（処理エンジンの読み込み時）</footer>
+
+  <div class="bottom-actions">
+    <button id="resetButton" class="secondary" type="button">リセット</button>
+    <button id="cutButton" class="primary" type="button" disabled>✂ 切り抜く</button>
+    <button id="infoButton" class="info-button" type="button" aria-label="使い方と注意事項">i</button>
+  </div>
+</div>
+
+<div id="infoOverlay" class="info-overlay" hidden>
+  <section class="info-dialog" role="dialog" aria-modal="true" aria-labelledby="infoTitle">
+    <div class="info-head"><h2 id="infoTitle">使い方・注意事項</h2><button id="infoClose" class="info-close" type="button" aria-label="閉じる">×</button></div>
+    <p>動画を選び、最初から／最後からと切り出す長さを指定して「切り抜く」を押してね。設定はこのブラウザのローカルストレージに保存され、次回も引き継がれるよ。</p>
+    <div class="notice privacy">動画ファイルは外部サーバーへアップロードせず、このブラウザ内で処理するよ。ただし初回は処理エンジン（約31MB）をネットから読み込む必要があるよ。</div>
+    <div class="notice">再エンコードしないので映像・音声を再圧縮しない一方、キーフレームの位置によっては切り出し開始位置が指定位置からずれる場合があるよ。完全なフレーム精度は保証できない仕様なんだ。</div>
+    <p><strong>保存などの設定</strong></p>
+    <ul>
+      <li><strong>通常ダウンロード：</strong>切り抜いたファイルをダウンロードする。</li>
+      <li><strong>共有：</strong>処理完了後に表示される共有ボタンをタップすると、対応端末の共有シートが開くよ。</li>
+      <li><strong>クイックルック：</strong>処理完了後に表示されるボタンから別画面でファイルを開くよ。一般のWebページからiOSのQuick Lookアプリを直接呼び出すことはできないため、ブラウザのプレビュー表示になるよ。</li>
+    </ul>
+    <p>共有・プレビューはブラウザやファイル形式によって使えないことがあるよ。大きいファイルはメモリ不足で処理できない場合があるよ。</p>
+  </section>
 </div>
 
 <script type="module">
@@ -177,7 +308,8 @@ const els = {
   progressWrap:$('progressWrap'), progressLabel:$('progressLabel'), progressPercent:$('progressPercent'), progressFill:$('progressFill'), progressDetail:$('progressDetail'),
   video:$('previewVideo'), image:$('previewImage'), previewEmpty:$('previewEmpty'), previewMeaning:$('previewMeaning'), previewTime:$('previewTime'), previewNote:$('previewNote'),
   fromStart:$('fromStart'), fromEnd:$('fromEnd'), amount:$('amount'), unit:$('unit'), fpsBox:$('fpsBox'), fpsInput:$('fpsInput'), fpsStatus:$('fpsStatus'),
-  cutSummary:$('cutSummary'), cutButton:$('cutButton'), resetButton:$('resetButton'), result:$('result')
+  cutSummary:$('cutSummary'), cutButton:$('cutButton'), resetButton:$('resetButton'), result:$('result'),
+  outputMode:$('outputMode'), infoButton:$('infoButton'), infoOverlay:$('infoOverlay'), infoClose:$('infoClose')
 };
 
 let ffmpeg = null;
@@ -202,6 +334,9 @@ let previewObjectURL = null;
 let currentOutputURL = null;
 let currentCut = null;
 let discoveredVideo = false;
+let currentOutputBlob = null;
+let currentOutputName = '';
+const SETTINGS_KEY = 'losslessVideoCutterSettingsV1';
 
 function fmtTime(seconds) {
   if (!Number.isFinite(seconds) || seconds < 0) seconds = 0;
@@ -313,16 +448,12 @@ function updateSummary() {
     els.cutButton.disabled = true;
     return;
   }
-  const requested = info.unit === 'frames'
-    ? `${info.count} フレーム（約 ${fmtTime(info.cutDuration)}）`
-    : `${info.count} ${unitText(info.unit)}（${fmtTime(info.cutDuration)}）`;
-  const rangeText = `${fmtTime(info.start)} ～ ${fmtTime(info.end)}（動画全体 ${fmtTime(sourceDuration)}）`;
+  const rangeText = `${fmtTime(info.start)} ～ ${fmtTime(info.end)}`;
   if (info.tooLong) {
-    els.cutSummary.innerHTML = `<span class="error">指定した長さが動画全体より長いよ。</span><div class="muted small" style="margin-top:5px">指定：${requested}<br>動画の長さ：${fmtTime(sourceDuration)}</div>`;
+    els.cutSummary.innerHTML = '<span class="error">指定した長さが動画全体より長いよ。</span>';
     els.cutButton.disabled = true;
   } else {
-    const modeText = selectedSide === 'start' ? '最初から切り出す末尾のフレーム' : '最後から切り出す先頭のフレーム';
-    els.cutSummary.innerHTML = `<div><strong>切り出し範囲</strong></div><div style="margin-top:5px">${rangeText}</div><div class="muted small" style="margin-top:5px">指定：${requested}</div><div class="muted small" style="margin-top:5px">プレビュー：${modeText}（${fmtTime(info.preview)}）</div>`;
+    els.cutSummary.innerHTML = `<div><strong>切り抜き範囲</strong></div><div style="margin-top:4px">${rangeText}</div><div class="muted small" style="margin-top:3px">動画全体 ${fmtTime(sourceDuration)}</div>`;
     els.cutButton.disabled = !engineLoaded || busy;
   }
   els.previewMeaning.textContent = selectedSide === 'start'
@@ -652,7 +783,6 @@ async function loadSelectedFile(file) {
   currentInputName = `input_media.${currentExt}`;
   sourceDuration = NaN;
   parsedFPS = NaN;
-  userChangedFPS = false;
   discoveredVideo = true;
   nativePreviewAvailable = false;
   nativePreviewFailed = false;
@@ -740,6 +870,103 @@ async function prepareWithFFmpeg(file, previousInputName = '') {
     if (pendingPreview) pumpPreview();
   }
 }
+function saveSettings() {
+  try {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({
+      selectedSide,
+      amount: els.amount.value,
+      unit: els.unit.value,
+      fpsInput: els.fpsInput.value,
+      userChangedFPS,
+      outputMode: els.outputMode.value
+    }));
+  } catch (error) {
+    console.warn('設定を保存できなかったよ:', error);
+  }
+}
+function restoreSettings() {
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || 'null'); } catch (_) {}
+  if (!saved || typeof saved !== 'object') return;
+  if (saved.selectedSide === 'start' || saved.selectedSide === 'end') selectedSide = saved.selectedSide;
+  if (typeof saved.amount === 'string' && saved.amount.trim() !== '' && Number.isFinite(Number(saved.amount)) && Number(saved.amount) > 0) els.amount.value = saved.amount;
+  if (['frames','seconds','minutes','hours'].includes(saved.unit)) els.unit.value = saved.unit;
+  if (typeof saved.fpsInput === 'string' && Number.isFinite(Number(saved.fpsInput)) && Number(saved.fpsInput) > 0 && Number(saved.fpsInput) <= 1000) els.fpsInput.value = saved.fpsInput;
+  userChangedFPS = saved.userChangedFPS === true;
+  if (['download','share','quicklook'].includes(saved.outputMode)) els.outputMode.value = saved.outputMode;
+  const isStart = selectedSide === 'start';
+  els.fromStart.classList.toggle('active', isStart);
+  els.fromEnd.classList.toggle('active', !isStart);
+  els.fromStart.setAttribute('aria-pressed', String(isStart));
+  els.fromEnd.setAttribute('aria-pressed', String(!isStart));
+  els.amount.step = els.unit.value === 'frames' ? '1' : 'any';
+}
+function triggerDownload(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
+async function shareCurrentOutput() {
+  if (!currentOutputBlob || !currentOutputName) return;
+  const file = new File([currentOutputBlob], currentOutputName, {type:currentOutputBlob.type || 'application/octet-stream'});
+  if (typeof navigator.share !== 'function' || typeof navigator.canShare !== 'function' || !navigator.canShare({files:[file]})) {
+    els.result.insertAdjacentHTML('beforeend', '<div class="muted small">このブラウザはファイル共有に対応していないため、通常ダウンロードを行うね。</div>');
+    triggerDownload(currentOutputBlob, currentOutputName);
+    return;
+  }
+  try {
+    await navigator.share({files:[file], title:currentOutputName});
+    const status = document.createElement('div');
+    status.className = 'muted small';
+    status.textContent = '共有シートを開いたよ。';
+    els.result.appendChild(status);
+  } catch (error) {
+    if (error && error.name === 'AbortError') {
+      const status = document.createElement('div');
+      status.className = 'muted small';
+      status.textContent = '共有をキャンセルしたよ。';
+      els.result.appendChild(status);
+    } else {
+      const status = document.createElement('div');
+      status.className = 'muted small';
+      status.textContent = `共有できなかったよ：${error && error.message ? error.message : String(error)}`;
+      els.result.appendChild(status);
+    }
+  }
+}
+function openQuickLook() {
+  if (!currentOutputURL) return;
+  const opened = window.open(currentOutputURL, '_blank');
+  if (!opened) {
+    const status = document.createElement('div');
+    status.className = 'muted small';
+    status.textContent = '新しい画面がブロックされたよ。下のダウンロードリンクを使ってね。';
+    els.result.appendChild(status);
+  }
+}
+function renderOutputResult(filename, blob, outputURL) {
+  const mode = els.outputMode.value;
+  currentOutputBlob = blob;
+  currentOutputName = filename;
+  els.result.style.display = 'block';
+  const linkHTML = `<div class="small" style="margin-top:4px"><a href="${outputURL}" download="${escapeHTML(filename)}">ファイルをもう一度保存</a></div>`;
+  if (mode === 'download') {
+    triggerDownload(blob, filename);
+    els.result.innerHTML = `<strong style="color:var(--ok)">✓ 切り抜き完了！</strong><div>${escapeHTML(filename)}（${humanSize(blob.size)}）</div>${linkHTML}`;
+  } else if (mode === 'share') {
+    els.result.innerHTML = `<strong style="color:var(--ok)">✓ 切り抜き完了！</strong><div>${escapeHTML(filename)}（${humanSize(blob.size)}）</div><button id="shareOutputButton" class="secondary" type="button">共有シートを開く</button>${linkHTML}`;
+    $('shareOutputButton').addEventListener('click', shareCurrentOutput);
+  } else {
+    els.result.innerHTML = `<strong style="color:var(--ok)">✓ 切り抜き完了！</strong><div>${escapeHTML(filename)}（${humanSize(blob.size)}）</div><button id="quicklookOutputButton" class="secondary" type="button">クイックルックで開く</button>${linkHTML}`;
+    $('quicklookOutputButton').addEventListener('click', openQuickLook);
+  }
+}
+
 function escapeHTML(str) {
   return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
@@ -785,15 +1012,8 @@ async function performCut() {
     const outputName = `${base}_cut-${suffix}.${currentExt}`;
     if (currentOutputURL) URL.revokeObjectURL(currentOutputURL);
     currentOutputURL = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = currentOutputURL;
-    a.download = outputName;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+    renderOutputResult(outputName, blob, currentOutputURL);
     finishProgress('完了！',`${outputName} · ${humanSize(blob.size)} · 再エンコードなし`);
-    els.result.style.display = 'block';
-    els.result.innerHTML = `<strong style="color:var(--ok)">✓ 切り抜き完了！</strong><div style="margin-top:5px">${escapeHTML(outputName)}（${humanSize(blob.size)}）</div><div class="small" style="margin-top:7px"><a href="${currentOutputURL}" download="${escapeHTML(outputName)}">ダウンロードをもう一度行う</a></div><div class="muted small" style="margin-top:7px">再エンコードなしで出力したよ。開始位置はキーフレームの影響を受ける場合がある点だけ注意してね。</div>`;
   } catch (error) {
     console.error(error);
     setProgress(100,'切り抜きに失敗',error && error.message ? error.message : String(error));
@@ -833,7 +1053,7 @@ function resetAll() {
   els.previewEmpty.textContent = '動画を選ぶと、切り抜き位置のフレームをここに表示するよ。';
   els.fromStart.classList.add('active'); els.fromEnd.classList.remove('active');
   els.fromStart.setAttribute('aria-pressed','true'); els.fromEnd.setAttribute('aria-pressed','false');
-  els.amount.value = '10'; els.unit.value = 'seconds'; els.fpsInput.value = '30';
+  els.amount.value = '10'; els.unit.value = 'seconds'; els.fpsInput.value = '30'; els.outputMode.value = 'download'; userChangedFPS = false;
   els.fpsStatus.textContent = '未解析（仮に30 FPS）';
   els.cutButton.disabled = true;
   els.result.style.display = 'none';
@@ -843,22 +1063,31 @@ function resetAll() {
   previewObjectURL = null;
   if (currentOutputURL) URL.revokeObjectURL(currentOutputURL);
   currentOutputURL = null;
+  currentOutputBlob = null;
+  currentOutputName = '';
+  saveSettings();
   updateSummary();
 }
 
+restoreSettings();
 els.dropzone.addEventListener('click', () => els.fileInput.click());
 els.dropzone.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); els.fileInput.click(); } });
 els.fileInput.addEventListener('change', e => { const file = e.target.files && e.target.files[0]; if (file) loadSelectedFile(file); });
 els.dropzone.addEventListener('dragover', e => { e.preventDefault(); els.dropzone.classList.add('drag'); });
 els.dropzone.addEventListener('dragleave', () => els.dropzone.classList.remove('drag'));
 els.dropzone.addEventListener('drop', e => { e.preventDefault(); els.dropzone.classList.remove('drag'); const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (file) loadSelectedFile(file); });
-els.fromStart.addEventListener('click', () => { selectedSide='start'; els.fromStart.classList.add('active'); els.fromEnd.classList.remove('active'); els.fromStart.setAttribute('aria-pressed','true'); els.fromEnd.setAttribute('aria-pressed','false'); schedulePreview(); });
-els.fromEnd.addEventListener('click', () => { selectedSide='end'; els.fromEnd.classList.add('active'); els.fromStart.classList.remove('active'); els.fromEnd.setAttribute('aria-pressed','true'); els.fromStart.setAttribute('aria-pressed','false'); schedulePreview(); });
-els.amount.addEventListener('input', schedulePreview);
-els.unit.addEventListener('change', () => { els.amount.step = els.unit.value === 'frames' ? '1' : 'any'; if (els.unit.value === 'frames') els.amount.step='1'; schedulePreview(); });
-els.fpsInput.addEventListener('input', () => { userChangedFPS=true; els.fpsStatus.textContent='手動設定'; els.fpsStatus.style.color='var(--cyan)'; schedulePreview(); });
+els.fromStart.addEventListener('click', () => { selectedSide='start'; els.fromStart.classList.add('active'); els.fromEnd.classList.remove('active'); els.fromStart.setAttribute('aria-pressed','true'); els.fromEnd.setAttribute('aria-pressed','false'); saveSettings(); schedulePreview(); });
+els.fromEnd.addEventListener('click', () => { selectedSide='end'; els.fromEnd.classList.add('active'); els.fromStart.classList.remove('active'); els.fromEnd.setAttribute('aria-pressed','true'); els.fromStart.setAttribute('aria-pressed','false'); saveSettings(); schedulePreview(); });
+els.amount.addEventListener('input', () => { saveSettings(); schedulePreview(); });
+els.unit.addEventListener('change', () => { els.amount.step = els.unit.value === 'frames' ? '1' : 'any'; saveSettings(); schedulePreview(); });
+els.fpsInput.addEventListener('input', () => { userChangedFPS=true; els.fpsStatus.textContent='手動設定'; els.fpsStatus.style.color='var(--cyan)'; saveSettings(); schedulePreview(); });
+els.outputMode.addEventListener('change', saveSettings);
 els.cutButton.addEventListener('click', performCut);
 els.resetButton.addEventListener('click', resetAll);
+els.infoButton.addEventListener('click', () => { els.infoOverlay.hidden = false; });
+els.infoClose.addEventListener('click', () => { els.infoOverlay.hidden = true; });
+els.infoOverlay.addEventListener('click', e => { if (e.target === els.infoOverlay) els.infoOverlay.hidden = true; });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') els.infoOverlay.hidden = true; });
 els.video.addEventListener('loadedmetadata', () => {
   if (Number.isFinite(els.video.duration) && els.video.duration > 0) {
     nativePreviewAvailable = true;
