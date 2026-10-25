@@ -170,7 +170,6 @@
 
 <script type="module">
 import { FFmpeg } from 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js';
-import { toBlobURL } from 'https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.2/dist/esm/index.js';
 
 const $ = (id) => document.getElementById(id);
 const els = {
@@ -211,7 +210,7 @@ function fmtTime(seconds) {
   const h = Math.floor(whole / 3600);
   const m = Math.floor((whole % 3600) / 60);
   const s = whole % 60;
-  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${String(ms).padStart(3,'0')}`;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}.${String(s).padStart(2,'0')}.${String(ms).padStart(3,'0')}`;
 }
 function humanSize(bytes) {
   if (!Number.isFinite(bytes)) return '';
@@ -406,36 +405,136 @@ async function pumpPreview() {
     if (pendingPreview && !busy && !nativePreviewAvailable) pumpPreview();
   }
 }
-async function ensureEngine() {
-  if (engineLoaded) return;
-  if (!ffmpeg) {
-    ffmpeg = new FFmpeg();
-    ffmpeg.on('log', ({message}) => {
-      if (operation === 'trim') {
-        const m = message.match(/time=(\d+):(\d+):(\d+(?:\.\d+)?)/);
-        if (m && currentCut && currentCut.duration > 0) {
-          const t = Number(m[1])*3600 + Number(m[2])*60 + Number(m[3]);
-          const relative = t > currentCut.start + 0.05 ? (t - currentCut.start) / currentCut.duration : t / currentCut.duration;
-          if (Number.isFinite(relative) && relative > 0 && relative < 1) {
-            setProgress(Math.max(5,Math.min(95,6+relative*88)), '切り抜き中…', '映像・音声を再エンコードせずコピー中');
-          }
+function createFFmpegInstance() {
+  const instance = new FFmpeg();
+  instance.on('log', ({message}) => {
+    if (operation === 'trim') {
+      const m = message.match(/time=(\d+):(\d+):(\d+(?:\.\d+)?)/);
+      if (m && currentCut && currentCut.duration > 0) {
+        const t = Number(m[1])*3600 + Number(m[2])*60 + Number(m[3]);
+        const relative = t > currentCut.start + 0.05 ? (t - currentCut.start) / currentCut.duration : t / currentCut.duration;
+        if (Number.isFinite(relative) && relative > 0 && relative < 1) {
+          setProgress(Math.max(5,Math.min(95,6+relative*88)), '切り抜き中…', '映像・音声を再エンコードせずコピー中');
         }
       }
-    });
-    ffmpeg.on('progress', ({progress}) => {
-      if (operation === 'trim' && Number.isFinite(progress) && progress > 0) {
-        setProgress(Math.max(5,Math.min(95,6+progress*88)), '切り抜き中…', '映像・音声を再エンコードせずコピー中');
+    }
+  });
+  instance.on('progress', ({progress}) => {
+    if (operation === 'trim' && Number.isFinite(progress) && progress > 0) {
+      setProgress(Math.max(5,Math.min(95,6+progress*88)), '切り抜き中…', '映像・音声を再エンコードせずコピー中');
+    }
+  });
+  return instance;
+}
+
+function withTimeout(promise, timeoutMs, errorMessage) {
+  let timer;
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => {
+      timer = setTimeout(() => reject(new Error(errorMessage)), timeoutMs);
+    })
+  ]).finally(() => clearTimeout(timer));
+}
+
+async function downloadBlobURL(url, mimeType, onProgress, timeoutMs = 45000, expectedBytes = 0) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, {signal:controller.signal, cache:'force-cache'});
+    if (!response.ok) throw new Error(`HTTP ${response.status}（${url}）`);
+    const headerLength = Number(response.headers.get('content-length'));
+    const total = Number.isFinite(headerLength) && headerLength > 0 ? headerLength : expectedBytes;
+    let blob;
+    if (response.body && typeof response.body.getReader === 'function') {
+      const reader = response.body.getReader();
+      const chunks = [];
+      let received = 0;
+      while (true) {
+        const {done, value} = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        received += value.byteLength;
+        if (onProgress) onProgress(total > 0 ? Math.min(100, received / total * 100) : 0, received, total);
       }
-    });
+      blob = new Blob(chunks, {type:mimeType});
+    } else {
+      const data = await response.arrayBuffer();
+      if (onProgress) onProgress(100, data.byteLength, total || data.byteLength);
+      blob = new Blob([data], {type:mimeType});
+    }
+    if (!blob.size) throw new Error(`ダウンロードしたファイルが空だった（${url}）`);
+    if (onProgress) onProgress(100, blob.size, total || blob.size);
+    return URL.createObjectURL(blob);
+  } catch (error) {
+    if (error && error.name === 'AbortError') {
+      throw new Error(`ダウンロードが時間切れになったよ：${url}`);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeout);
   }
-  setProgress(4, '処理エンジンを読み込み中…', '初回は約31MBのダウンロードが発生するよ。');
-  const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/umd';
-  const [coreURL, wasmURL] = await Promise.all([
-    toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-    toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm')
-  ]);
-  await ffmpeg.load({coreURL, wasmURL});
-  engineLoaded = true;
+}
+
+async function ensureEngine() {
+  if (engineLoaded) return;
+  const sources = [
+    {name:'jsDelivr', base:'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/umd'},
+    {name:'unpkg', base:'https://unpkg.com/@ffmpeg/core@0.12.10/dist/umd'}
+  ];
+  const failures = [];
+  for (const source of sources) {
+    let coreURL = null;
+    let wasmURL = null;
+    try {
+      setProgress(4, '処理エンジンを読み込み中…', `${source.name} に接続中…`, true);
+      coreURL = await downloadBlobURL(
+        `${source.base}/ffmpeg-core.js`,
+        'text/javascript',
+        (percent, received, total) => {
+          const detail = total > 0
+            ? `${source.name}：起動ファイル ${humanSize(received)} / ${humanSize(total)}`
+            : `${source.name}：起動ファイルをダウンロード中…`;
+          setProgress(5 + percent * 0.05, '処理エンジンをダウンロード中…', detail);
+        },
+        30000,
+        180000
+      );
+      wasmURL = await downloadBlobURL(
+        `${source.base}/ffmpeg-core.wasm`,
+        'application/wasm',
+        (percent, received, total) => {
+          const detail = total > 0
+            ? `${source.name}：本体 ${humanSize(received)} / ${humanSize(total)}`
+            : `${source.name}：本体をダウンロード中…`;
+          setProgress(10 + percent * 0.42, '処理エンジンをダウンロード中…', detail);
+        },
+        60000,
+        32000000
+      );
+      setProgress(54, '処理エンジンを起動中…', 'ダウンロード完了。ブラウザ内でFFmpegを準備しているよ。', true);
+      ffmpeg = createFFmpegInstance();
+      await withTimeout(
+        ffmpeg.load({coreURL, wasmURL}),
+        45000,
+        '処理エンジンの起動がタイムアウトしたよ。ブラウザまたは端末がこの処理方式に対応していない可能性がある。'
+      );
+      engineLoaded = true;
+      setProgress(56, '処理エンジンの準備完了', '動画ファイルを読み込んでいるよ。');
+      return;
+    } catch (error) {
+      console.error(`${source.name} engine load failed:`, error);
+      failures.push(`${source.name}：${error && error.message ? error.message : String(error)}`);
+      if (ffmpeg) {
+        try { ffmpeg.terminate(); } catch (_) {}
+        ffmpeg = null;
+      }
+      if (coreURL) URL.revokeObjectURL(coreURL);
+      if (wasmURL) URL.revokeObjectURL(wasmURL);
+      setProgress(4, '別の配信元を試しているよ…', failures[failures.length - 1], true);
+    }
+  }
+  throw new Error(`処理エンジンを読み込めなかったよ。ネット接続を確認して再試行してね。\n${failures.join('\n')}`);
 }
 async function loadSelectedFile(file) {
   if (!file) return;
@@ -650,7 +749,7 @@ els.dropzone.addEventListener('dragover', e => { e.preventDefault(); els.dropzon
 els.dropzone.addEventListener('dragleave', () => els.dropzone.classList.remove('drag'));
 els.dropzone.addEventListener('drop', e => { e.preventDefault(); els.dropzone.classList.remove('drag'); const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (file) loadSelectedFile(file); });
 els.fromStart.addEventListener('click', () => { selectedSide='start'; els.fromStart.classList.add('active'); els.fromEnd.classList.remove('active'); els.fromStart.setAttribute('aria-pressed','true'); els.fromEnd.setAttribute('aria-pressed','false'); schedulePreview(); });
-els.fromEnd.addEventListener('click', () => { selectedSide='end'; els.fromEnd.classList.add('active'); els.fromStart.classList.remove('active'); els.fromEnd.setAttribute('aria-pressed','true'); els.fromStart.setAttribute('aria-pressed','false'); schedulePreview(); });
+els.fromEnd.addEventListener('click', () => { selectedSide='end'; els.fromEnd.classList.add('active'); els.fromStart.classList.remove('active'); els.fromEnd.setAttribute('aria-pressed','false'); els.fromStart.setAttribute('aria-pressed','true'); schedulePreview(); });
 els.amount.addEventListener('input', schedulePreview);
 els.unit.addEventListener('change', () => { els.amount.step = els.unit.value === 'frames' ? '1' : 'any'; if (els.unit.value === 'frames') els.amount.step='1'; schedulePreview(); });
 els.fpsInput.addEventListener('input', () => { userChangedFPS=true; els.fpsStatus.textContent='手動設定'; els.fpsStatus.style.color='var(--cyan)'; schedulePreview(); });
