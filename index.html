@@ -2,524 +2,688 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#10131c">
-<title>無劣化メディアカッター</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Lossless Video Cutter - 劣化なし動画カット</title>
 <style>
-:root{color-scheme:dark;--bg:#10131c;--panel:#191e2b;--panel2:#202738;--line:#30394c;--text:#edf2ff;--muted:#a9b4ca;--accent:#8ba7ff;--accent2:#b5c5ff;--good:#91e5c1;--warn:#ffd28c;--bad:#ff9eae}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#1b2340 0,#10131c 48rem);color:var(--text);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}main{width:min(100%,980px);margin:0 auto;padding:26px 16px 56px}h1{font-size:clamp(1.55rem,4vw,2.15rem);line-height:1.2;margin:0 0 9px;letter-spacing:.01em}.subtitle{color:var(--muted);margin:0 0 22px}.panel{background:rgba(25,30,43,.94);border:1px solid var(--line);border-radius:18px;padding:18px;margin:14px 0;box-shadow:0 14px 40px #0002}.dropzone{border:2px dashed #536182;background:#171e30;border-radius:16px;padding:26px 14px;text-align:center;cursor:pointer;transition:.15s}.dropzone.over{border-color:var(--accent);background:#222d49}.dropzone strong{display:block;font-size:1.05rem}.dropzone small{display:block;color:var(--muted);margin-top:5px}.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.row>*{min-width:0}.grow{flex:1}.filename{font-weight:650;overflow-wrap:anywhere}.meta{color:var(--muted);font-size:.9rem}.layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(270px,.8fr);gap:14px;align-items:start}.previewbox{position:relative;background:#090b11;border:1px solid var(--line);border-radius:14px;overflow:hidden;min-height:230px;display:flex;align-items:center;justify-content:center;aspect-ratio:16/9}.previewbox video,.previewbox img{display:block;width:100%;height:100%;max-height:65vh;object-fit:contain}.previewbox img{display:none}.blank{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:18px;color:var(--muted)}.timestamp{font-variant-numeric:tabular-nums;color:var(--accent2);font-size:.9rem;margin-top:9px}.section-title{font-size:1.02rem;font-weight:700;margin:0 0 12px}.field{display:flex;flex-direction:column;gap:6px;margin:12px 0}.field label,.label{font-size:.9rem;color:var(--muted)}input[type=number],select{width:100%;background:#101522;color:var(--text);border:1px solid #3b4660;border-radius:10px;padding:11px 12px;font:inherit;min-height:44px}input[type=number]:focus,select:focus,button:focus-visible,.dropzone:focus-visible{outline:2px solid var(--accent);outline-offset:2px}.toggle{display:flex;gap:8px}.toggle button{flex:1}.btn{appearance:none;border:1px solid #46516b;background:#272f43;color:var(--text);padding:10px 14px;border-radius:11px;font:inherit;font-weight:650;cursor:pointer;transition:filter .15s,transform .05s}.btn:hover{filter:brightness(1.12)}.btn:active{transform:translateY(1px)}.btn.primary{background:linear-gradient(135deg,#8ba7ff,#6e89e8);border-color:#a8baff;color:#0b1020}.btn.active{background:#35456b;border-color:var(--accent);color:#fff}.btn:disabled{opacity:.45;cursor:not-allowed}.units{display:grid;grid-template-columns:minmax(0,1fr) minmax(130px,.8fr);gap:10px}.hint{border-radius:12px;background:#121927;border:1px solid #2b3448;color:var(--muted);padding:12px;font-size:.88rem;margin-top:12px}.hint strong{color:var(--text)}.warning{border-left:3px solid var(--warn);padding:9px 12px;color:#ffe5bd;background:#382b1b55;border-radius:4px 10px 10px 4px;font-size:.88rem;margin-top:12px}.status{margin:12px 0 0;color:var(--muted);font-size:.9rem;overflow-wrap:anywhere;white-space:pre-wrap}.status.good{color:var(--good)}.status.bad{color:var(--bad)}.progress{height:7px;background:#0d111a;border-radius:99px;overflow:hidden;margin-top:12px}.progress>div{width:0;height:100%;background:linear-gradient(90deg,#8ba7ff,#91e5c1);transition:width .15s}.result{display:none;margin-top:14px;padding:13px;background:#142b28;border:1px solid #315d53;border-radius:12px}.result a{color:#b9ffe2;font-weight:700;overflow-wrap:anywhere}.muted{color:var(--muted)}.small{font-size:.84rem}.hidden{display:none!important}@media(max-width:720px){main{padding:18px 12px 36px}.layout{grid-template-columns:1fr}.panel{padding:14px}.previewbox{min-height:180px}.units{grid-template-columns:1fr 1fr}}
+  :root{color-scheme:dark;--bg:#0a0d14;--panel:#111722;--panel2:#151e2c;--line:#273448;--text:#edf3fc;--muted:#9aa9bd;--cyan:#62e4dc;--blue:#759bff;--danger:#ff8c9e;--ok:#78e0a0;--radius:18px}
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1000px 550px at 15% -10%,#142544 0,transparent 60%),radial-gradient(900px 500px at 100% 0,#1a1739 0,transparent 55%),var(--bg);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);line-height:1.55;min-height:100vh}
+  .wrap{width:min(1080px,100%);margin:auto;padding:28px 18px 48px}
+  header{display:flex;align-items:center;gap:14px;margin-bottom:24px}
+  .logo{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,var(--cyan),var(--blue));color:#071018;font-size:25px;font-weight:900;box-shadow:0 8px 32px #62e4dc20}
+  h1{margin:0;font-size:clamp(22px,4vw,32px);letter-spacing:-.03em;line-height:1.2}
+  .sub{margin:6px 0 0;color:var(--muted);font-size:13px}
+  .panel{background:linear-gradient(180deg,#141b27f2,#101621f5);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin:16px 0;box-shadow:0 12px 32px #00000016}
+  .section-title{display:flex;align-items:center;gap:9px;font-size:16px;font-weight:800;margin:0 0 14px}
+  .step{display:inline-grid;place-items:center;flex:none;width:27px;height:27px;border-radius:9px;background:#21354b;color:var(--cyan);font-size:13px}
+  .dropzone{border:1.5px dashed #476078;border-radius:16px;padding:26px 16px;text-align:center;background:#0b121e;transition:.18s;cursor:pointer}
+  .dropzone.drag{border-color:var(--cyan);background:#10272b}
+  .dropzone strong{display:block;font-size:16px;margin-bottom:5px}
+  .dropzone p{margin:0;color:var(--muted);font-size:13px}
+  .file-icon{font-size:30px;margin-bottom:7px}
+  .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .file-meta{margin-top:13px;display:none;align-items:center;gap:10px;justify-content:space-between;border:1px solid var(--line);background:#0c121c;border-radius:12px;padding:11px 13px}
+  .file-name{font-size:14px;overflow-wrap:anywhere;min-width:0}
+  .muted{color:var(--muted)}
+  .small{font-size:12px}
+  .tag{display:inline-flex;align-items:center;gap:5px;border:1px solid #2c3e51;color:#c2d2e7;background:#152232;border-radius:999px;padding:3px 9px;font-size:11px;white-space:nowrap}
+  .tag.ok{border-color:#24543f;color:#9ce8b9;background:#10251c}
+  .tag.warn{border-color:#6b5130;color:#ffd49b;background:#2a2013}
+  .grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);gap:16px;align-items:start}
+  .preview-shell{background:#05080d;border:1px solid #283548;border-radius:14px;overflow:hidden;position:relative;aspect-ratio:16/9;display:grid;place-items:center;min-height:180px}
+  video{width:100%;height:100%;object-fit:contain;background:#05080d;max-height:440px}
+  #previewImage{width:100%;height:100%;object-fit:contain;background:#05080d;max-height:440px}
+  .preview-empty{padding:20px;color:#72839a;text-align:center;font-size:13px}
+  .preview-footer{display:flex;justify-content:space-between;gap:10px;align-items:center;padding-top:10px;flex-wrap:wrap}
+  .preview-time{font-variant-numeric:tabular-nums;font-weight:750;color:var(--cyan)}
+  .controls{display:grid;gap:14px}
+  .label{display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#cfdaea}
+  .segmented{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  button,select,input{font:inherit}
+  button{cursor:pointer;transition:transform .12s,border-color .12s,background .12s}
+  button:active{transform:translateY(1px)}
+  .choice{border:1px solid #33435a;background:#0d1420;color:#c3d0e1;border-radius:12px;padding:11px 10px;font-weight:750;font-size:13px}
+  .choice.active{border-color:#4b9d9a;background:#143034;color:#b2fff5;box-shadow:inset 0 0 0 1px #62e4dc18}
+  .fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(110px,.7fr);gap:10px}
+  input[type=number],select{width:100%;min-width:0;border:1px solid #344258;border-radius:11px;background:#090f18;color:var(--text);padding:11px 12px;outline:none}
+  input[type=number]:focus,select:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #62e4dc18}
+  .fps-box{display:none;border:1px solid #314253;border-radius:12px;background:#0d141e;padding:10px 12px}
+  .fps-box.show{display:block}
+  .fps-inner{display:flex;gap:12px;align-items:center}
+  .fps-inner input{max-width:130px}
+  .summary{background:#0b131e;border:1px solid #26374c;border-radius:12px;padding:12px 13px;font-size:13px}
+  .summary strong{color:var(--cyan)}
+  .summary .error{color:var(--danger)}
+  .action{display:flex;gap:10px;flex-wrap:wrap}
+  .primary{flex:1;min-width:180px;background:linear-gradient(105deg,#62e4dc,#80a1ff);color:#07121b;border:0;border-radius:12px;padding:13px 16px;font-weight:900}
+  .secondary{background:#1a2637;color:#e1eafa;border:1px solid #35445b;border-radius:12px;padding:12px 14px;font-weight:700}
+  button:disabled{opacity:.45;cursor:not-allowed;transform:none}
+  .progress-wrap{margin-top:14px;display:none}
+  .progress-head{display:flex;justify-content:space-between;gap:12px;color:#c7d4e6;font-size:12px;margin-bottom:7px}
+  .progress-track{height:10px;border-radius:999px;background:#070b12;border:1px solid #273448;overflow:hidden}
+  .progress-fill{height:100%;width:0%;border-radius:inherit;background:linear-gradient(90deg,var(--cyan),var(--blue));transition:width .14s linear;position:relative}
+  .progress-fill.indeterminate{width:38%;background:linear-gradient(90deg,#62e4dc55,#62e4dc,#759bff);animation:sweep 1.2s ease-in-out infinite alternate}
+  @keyframes sweep{from{transform:translateX(-8%)}to{transform:translateX(175%)}}
+  .notice{border-left:3px solid #d6a55a;background:#211b13;color:#e8d2ac;border-radius:0 10px 10px 0;padding:11px 13px;font-size:12px;margin-top:13px}
+  .privacy{border-left-color:#4ab89e;background:#0e201d;color:#b1e9dc}
+  .result{display:none;margin-top:14px;padding:13px;border:1px solid #2c6348;background:#10251b;border-radius:12px;overflow-wrap:anywhere}
+  .result a{color:#a5f0bf;font-weight:800}
+  .status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#63748b;margin-right:5px}
+  .status-dot.active{background:var(--cyan);box-shadow:0 0 10px #62e4dc66}
+  footer{color:#78869a;font-size:11px;text-align:center;margin-top:25px}
+  [hidden]{display:none!important}
+  @media(max-width:760px){.wrap{padding:20px 12px 32px}.panel{padding:15px}.grid{grid-template-columns:1fr}.preview-shell{min-height:0}.preview-footer{align-items:flex-start}.fields{grid-template-columns:minmax(0,1fr) minmax(105px,.75fr)}}
 </style>
 </head>
 <body>
-<main>
-  <h1>無劣化メディアカッター</h1>
-  <p class="subtitle">動画の最初／最後から、指定した長さを切り出す。再エンコードせず、画質・音質を保ったまま保存。</p>
+<div class="wrap">
+  <header>
+    <div class="logo" aria-hidden="true">✂</div>
+    <div>
+      <h1>劣化なし動画カット</h1>
+      <p class="sub">最初から／最後から、指定した長さだけ切り出す。再エンコードなし。</p>
+    </div>
+  </header>
 
   <section class="panel">
-    <div id="dropzone" class="dropzone" role="button" tabindex="0" aria-label="動画ファイルを選択またはドロップ">
-      <strong>動画ファイルを選択、またはここにドラッグ＆ドロップ</strong>
-      <small>MP4 / MOV / WebM / MKV / AVI / WMV / MPEG / TS / 3GP など</small>
-      <input id="fileInput" type="file" accept="video/*,.mp4,.m4v,.mov,.mkv,.webm,.avi,.wmv,.flv,.mpg,.mpeg,.m2ts,.mts,.ts,.3gp,.ogv,.vob,.mxf,.dv" hidden>
+    <h2 class="section-title"><span class="step">1</span>動画ファイルを選ぶ</h2>
+    <div id="dropzone" class="dropzone" role="button" tabindex="0" aria-label="動画ファイルを選ぶ">
+      <div class="file-icon">▤</div>
+      <strong>ここに動画をドラッグ＆ドロップ</strong>
+      <p>またはタップ／クリックしてファイルを選択</p>
+      <p class="small" style="margin-top:10px">MP4 / MOV / MKV / WEBM / AVI / M4V / WMV / FLV / MPEG / TS / 3GP など</p>
+      <input id="fileInput" type="file" accept="video/*,.mp4,.mov,.mkv,.webm,.avi,.m4v,.wmv,.flv,.mpeg,.mpg,.ts,.mts,.m2ts,.3gp,.ogv,.vob" hidden>
     </div>
-    <div id="fileMeta" class="row hidden" style="margin-top:14px">
-      <div class="grow"><div id="fileName" class="filename"></div><div id="fileDetails" class="meta"></div></div>
-      <button id="changeFile" class="btn" type="button">別のファイル</button>
+    <div id="fileMeta" class="file-meta">
+      <div style="min-width:0"><div id="fileName" class="file-name"></div><div id="fileInfo" class="muted small"></div></div>
+      <span id="fileStatus" class="tag"><span class="status-dot"></span>準備中</span>
     </div>
+    <div id="progressWrap" class="progress-wrap" aria-live="polite">
+      <div class="progress-head"><span id="progressLabel">準備中…</span><strong id="progressPercent">0%</strong></div>
+      <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
+      <div id="progressDetail" class="muted small" style="margin-top:6px"></div>
+    </div>
+    <div class="notice privacy">動画ファイル自体は外部サーバーへアップロードせず、このブラウザ内で処理するよ。初回は処理エンジン（約31MB）をネットから読み込む必要あり。</div>
   </section>
 
-  <div class="layout">
+  <div class="grid">
     <section class="panel">
-      <h2 class="section-title">境界フレームのプレビュー</h2>
-      <div class="previewbox">
-        <video id="previewVideo" playsinline controls preload="metadata"></video>
-        <img id="previewImage" alt="FFmpegで生成したプレビュー画像">
-        <div id="previewBlank" class="blank">動画を選ぶと、切り出し位置のフレームをここに表示するよ。</div>
+      <h2 class="section-title"><span class="step">2</span>切り抜き位置をプレビュー</h2>
+      <div class="preview-shell">
+        <video id="previewVideo" controls playsinline hidden></video>
+        <img id="previewImage" alt="切り抜き位置のプレビュー" hidden>
+        <div id="previewEmpty" class="preview-empty">動画を選ぶと、切り抜き位置のフレームをここに表示するよ。</div>
       </div>
-      <div id="previewStamp" class="timestamp">プレビュー位置：--</div>
-      <p id="previewNote" class="meta">開始側は切り出し範囲の最後のフレーム、終了側は最初のフレームを表示。</p>
+      <div class="preview-footer">
+        <span id="previewMeaning" class="muted small">プレビュー位置：未選択</span>
+        <span id="previewTime" class="preview-time">00:00:00.000</span>
+      </div>
+      <div id="previewNote" class="muted small" style="margin-top:7px">フレーム単位の位置はFPSを基に計算するよ。</div>
     </section>
 
     <section class="panel">
-      <h2 class="section-title">切り出し設定</h2>
-      <div class="field">
-        <span class="label">どちら側から切り出す？</span>
-        <div class="toggle">
-          <button id="fromStart" class="btn active" type="button" aria-pressed="true">最初から</button>
-          <button id="fromEnd" class="btn" type="button" aria-pressed="false">最後から</button>
+      <h2 class="section-title"><span class="step">3</span>切り抜き範囲を指定</h2>
+      <div class="controls">
+        <div>
+          <span class="label">どちら側から切り出す？</span>
+          <div class="segmented">
+            <button type="button" id="fromStart" class="choice active" aria-pressed="true">◀ 最初から</button>
+            <button type="button" id="fromEnd" class="choice" aria-pressed="false">最後から ▶</button>
+          </div>
         </div>
-      </div>
-      <div class="field">
-        <label for="amount">切り出す長さ</label>
-        <div class="units">
-          <input id="amount" type="number" min="0.001" step="0.1" value="5" inputmode="decimal">
-          <select id="unit" aria-label="長さの単位">
-            <option value="seconds" selected>秒</option>
-            <option value="frames">フレーム</option>
-            <option value="minutes">分</option>
-            <option value="hours">時</option>
-          </select>
+        <div>
+          <span class="label" for="amount">切り出す長さ</span>
+          <div class="fields">
+            <input id="amount" type="number" min="1" step="1" value="10" inputmode="decimal" aria-label="切り出す長さ">
+            <select id="unit" aria-label="長さの単位">
+              <option value="frames">フレーム</option>
+              <option value="seconds" selected>秒</option>
+              <option value="minutes">分</option>
+              <option value="hours">時間</option>
+            </select>
+          </div>
         </div>
-      </div>
-      <div class="field">
-        <label for="fps">動画のFPS（フレーム指定時に使用）</label>
-        <div class="row">
-          <input id="fps" type="number" min="0.001" max="1000" step="any" value="30" style="flex:1">
-          <button id="prepare" class="btn" type="button">FPSを自動検出</button>
+        <div id="fpsBox" class="fps-box">
+          <label class="label" for="fpsInput">フレームレート（FPS）</label>
+          <div class="fps-inner"><input id="fpsInput" type="number" min="0.001" max="1000" step="any" value="30" inputmode="decimal"><span id="fpsStatus" class="muted small">未解析（仮に30 FPS）</span></div>
+          <div class="muted small" style="margin-top:7px">自動判定が合わない場合はここを修正してね。可変フレームレート動画ではフレーム指定が概算になる場合あり。</div>
         </div>
-        <div id="fpsNote" class="meta">初期値は30 FPS。必要なら動画のFPSに合わせて変更してね。</div>
+        <div id="cutSummary" class="summary">動画を選ぶと、切り抜く範囲を表示するよ。</div>
+        <div class="action">
+          <button id="cutButton" class="primary" type="button" disabled>✂ 劣化なしで切り抜く</button>
+          <button id="resetButton" class="secondary" type="button">リセット</button>
+        </div>
+        <div class="muted small">出力は元ファイルと同じコンテナ形式・拡張子。映像・音声を再エンコードせずにコピーするため速く、再圧縮による劣化がないよ。</div>
       </div>
-      <div class="hint">
-        <strong>プレビューの動き</strong><br>
-        「最初から」では切り出し範囲の最後のフレーム、「最後から」では切り出し範囲の最初のフレームへ自動で移動するよ。数値を変えるとプレビューも更新される。
-      </div>
-      <div class="warning">無劣化を優先するため、出力は再エンコードなし（ストリームコピー）。H.264 / HEVC など一般的な動画では、実際の開始・終了位置がキーフレームに合わせてずれることがあり、任意の1フレームぴったりは保証できないよ。</div>
-      <button id="cut" class="btn primary" type="button" disabled style="width:100%;margin-top:16px">無劣化で切り出す</button>
-      <div class="progress"><div id="progressBar"></div></div>
-      <div id="status" class="status" role="status" aria-live="polite">まず動画を選んでね。</div>
-      <div id="result" class="result"><div id="resultInfo" class="small"></div><a id="downloadLink" href="#" download>切り出したファイルをダウンロード</a></div>
+      <div id="result" class="result" role="status"></div>
     </section>
   </div>
 
   <section class="panel">
-    <h2 class="section-title">対応形式・プライバシーについて</h2>
-    <p class="small muted">処理にはブラウザ内で動くFFmpeg WebAssemblyを使うよ。一般的な動画コンテナ／コーデックの多くを扱えるけど、ビルドに含まれないコーデックや壊れたファイルは処理できないことがある。ブラウザが直接再生できない形式では、エンジン準備後に静止画プレビューを試すよ。</p>
-    <p class="small muted">初回はFFmpeg本体（約30MB以上）をCDNから読み込むため、ネット接続が必要。動画そのものはサーバーにアップロードせず、端末内で処理するよ。大きなファイルはメモリ不足になる場合があるので注意。</p>
+    <h2 class="section-title"><span class="step">!</span>「劣化なし」についての大事な注意</h2>
+    <div class="notice">再エンコードしないので映像・音声そのものは再圧縮されないけど、動画の開始位置は<strong>キーフレーム</strong>の位置に影響される場合があり、指定フレームぴったりにならないことがあるよ。どんな動画でも「完全なフレーム精度」と「再エンコードなし」を同時に保証することはできない仕様なんだ。</div>
+    <p class="muted small" style="margin:12px 0 0">ブラウザのメモリ上限により、非常に大きなファイルは処理できない場合があるよ。処理に失敗したら、より小さいファイルやPCのブラウザで試してね。</p>
   </section>
-</main>
+  <footer>ローカル動画カッター · FFmpeg.wasm · インターネット接続が必要（処理エンジンの読み込み時）</footer>
+</div>
 
-<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.6/dist/umd/ffmpeg.min.js"></script>
-<script>
-(() => {
-  const $ = (id) => document.getElementById(id);
-  const dropzone = $('dropzone');
-  const fileInput = $('fileInput');
-  const fileMeta = $('fileMeta');
-  const fileName = $('fileName');
-  const fileDetails = $('fileDetails');
-  const video = $('previewVideo');
-  const previewImage = $('previewImage');
-  const previewBlank = $('previewBlank');
-  const previewStamp = $('previewStamp');
-  const previewNote = $('previewNote');
-  const amount = $('amount');
-  const unit = $('unit');
-  const fpsInput = $('fps');
-  const fpsNote = $('fpsNote');
-  const startButton = $('fromStart');
-  const endButton = $('fromEnd');
-  const prepareButton = $('prepare');
-  const cutButton = $('cut');
-  const statusEl = $('status');
-  const progressBar = $('progressBar');
-  const result = $('result');
-  const resultInfo = $('resultInfo');
-  const downloadLink = $('downloadLink');
+<script type="module">
+import { FFmpeg } from 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js';
+import { toBlobURL } from 'https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.2/dist/esm/index.js';
 
-  let selectedFile = null;
-  let previewURL = null;
-  let downloadURL = null;
-  let cuttingFrom = 'start';
-  let durationFromFFmpeg = NaN;
-  let nativePlayable = false;
-  let nativeFailed = false;
-  let ffmpeg = null;
-  let ffmpegLoaded = false;
-  let sourceLoadedFor = null;
-  let sourceName = 'source.mp4';
-  let outputMime = 'application/octet-stream';
-  let busy = false;
-  let fallbackTimer = null;
-  let fallbackSequence = 0;
-  let lastFallbackURL = null;
-  const objectURLs = [];
-  const CORE_VERSION = '0.12.6';
-  const FFMPEG_BASE = `https://cdn.jsdelivr.net/npm/@ffmpeg/core@${CORE_VERSION}/dist/umd`;
-  const FFMPG_PACKAGE_BASE = `https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@${CORE_VERSION}/dist/umd`;
+const $ = (id) => document.getElementById(id);
+const els = {
+  dropzone:$('dropzone'), fileInput:$('fileInput'), fileMeta:$('fileMeta'), fileName:$('fileName'), fileInfo:$('fileInfo'), fileStatus:$('fileStatus'),
+  progressWrap:$('progressWrap'), progressLabel:$('progressLabel'), progressPercent:$('progressPercent'), progressFill:$('progressFill'), progressDetail:$('progressDetail'),
+  video:$('previewVideo'), image:$('previewImage'), previewEmpty:$('previewEmpty'), previewMeaning:$('previewMeaning'), previewTime:$('previewTime'), previewNote:$('previewNote'),
+  fromStart:$('fromStart'), fromEnd:$('fromEnd'), amount:$('amount'), unit:$('unit'), fpsBox:$('fpsBox'), fpsInput:$('fpsInput'), fpsStatus:$('fpsStatus'),
+  cutSummary:$('cutSummary'), cutButton:$('cutButton'), resetButton:$('resetButton'), result:$('result')
+};
 
-  function setStatus(message, kind = '') {
-    statusEl.textContent = message;
-    statusEl.className = 'status' + (kind ? ' ' + kind : '');
+let ffmpeg = null;
+let engineLoaded = false;
+let currentFile = null;
+let currentInputName = '';
+let currentExt = 'mp4';
+let sourceDuration = NaN;
+let parsedFPS = NaN;
+let selectedSide = 'start';
+let nativePreviewAvailable = false;
+let nativePreviewFailed = false;
+let userChangedFPS = false;
+let busy = false;
+let operation = '';
+let previewTimer = null;
+let previewTicket = 0;
+let pendingPreview = null;
+let previewPumpRunning = false;
+let currentObjectURL = null;
+let previewObjectURL = null;
+let currentOutputURL = null;
+let currentCut = null;
+let discoveredVideo = false;
+
+function fmtTime(seconds) {
+  if (!Number.isFinite(seconds) || seconds < 0) seconds = 0;
+  const ms = Math.floor((seconds - Math.floor(seconds)) * 1000 + 1e-4);
+  const whole = Math.floor(seconds);
+  const h = Math.floor(whole / 3600);
+  const m = Math.floor((whole % 3600) / 60);
+  const s = whole % 60;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${String(ms).padStart(3,'0')}`;
+}
+function humanSize(bytes) {
+  if (!Number.isFinite(bytes)) return '';
+  const units = ['B','KB','MB','GB']; let n = bytes, i = 0;
+  while (n >= 1024 && i < units.length-1) { n /= 1024; i++; }
+  return `${n.toFixed(i === 0 ? 0 : 2)} ${units[i]}`;
+}
+function setProgress(percent, label, detail = '', indeterminate = false) {
+  els.progressWrap.style.display = 'block';
+  els.progressLabel.textContent = label;
+  els.progressDetail.textContent = detail;
+  els.progressPercent.textContent = indeterminate ? '処理中' : `${Math.max(0,Math.min(100,Math.round(percent)))}%`;
+  els.progressFill.classList.toggle('indeterminate', indeterminate);
+  if (indeterminate) els.progressFill.style.width = '';
+  else els.progressFill.style.width = `${Math.max(0,Math.min(100,percent))}%`;
+}
+function finishProgress(label, detail = '') {
+  setProgress(100, label, detail, false);
+}
+function setFileStatus(text, kind = '') {
+  els.fileStatus.className = `tag${kind ? ' '+kind : ''}`;
+  els.fileStatus.innerHTML = `<span class="status-dot ${kind === 'ok' ? 'active' : ''}"></span>${text}`;
+}
+function extFromName(name) {
+  const match = String(name).match(/\.([a-zA-Z0-9]+)$/);
+  const ext = match ? match[1].toLowerCase() : 'mp4';
+  return /^[a-z0-9]{1,8}$/.test(ext) ? ext : 'mp4';
+}
+function durationFromLogs(logText) {
+  const match = logText.match(/Duration:\s*(\d+):(\d+):(\d+(?:\.\d+)?)/i);
+  if (!match) return NaN;
+  return Number(match[1])*3600 + Number(match[2])*60 + Number(match[3]);
+}
+function fpsFromLogs(logText) {
+  const lines = logText.split('\n').filter(line => /\bVideo:/i.test(line));
+  for (const line of lines) {
+    let match = line.match(/\b([\d]+(?:\.[\d]+)?)\s*fps\b/i);
+    if (match && Number(match[1]) > 0 && Number(match[1]) < 1000) return Number(match[1]);
   }
-  function setBusy(value) {
-    busy = value;
-    cutButton.disabled = !selectedFile || value;
-    prepareButton.disabled = value || !selectedFile;
-    fileInput.disabled = value;
-    $('changeFile').disabled = value;
-    startButton.disabled = value;
-    endButton.disabled = value;
-    amount.disabled = value;
-    unit.disabled = value;
-    fpsInput.disabled = value;
+  for (const line of lines) {
+    const match = line.match(/,\s*([\d]+(?:\.[\d]+)?)\s*tbr\b/i);
+    if (match && Number(match[1]) > 0 && Number(match[1]) < 1000) return Number(match[1]);
   }
-  function fmtTime(seconds) {
-    if (!Number.isFinite(seconds) || seconds < 0) return '--';
-    const ms = Math.floor((seconds % 1) * 1000);
-    const whole = Math.floor(seconds);
-    const h = Math.floor(whole / 3600);
-    const m = Math.floor((whole % 3600) / 60);
-    const s = whole % 60;
-    return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${String(ms).padStart(3,'0')}`;
-  }
-  function fmtSize(bytes) {
-    if (!Number.isFinite(bytes)) return 'サイズ不明';
-    const units = ['B','KB','MB','GB'];
-    let value = bytes, i = 0;
-    while (value >= 1024 && i < units.length - 1) { value /= 1024; i++; }
-    return `${value.toFixed(i === 0 ? 0 : 2)} ${units[i]}`;
-  }
-  function getDuration() {
-    if (Number.isFinite(video.duration) && video.duration > 0) return video.duration;
-    return durationFromFFmpeg;
-  }
-  function getFps() {
-    const fps = Number(fpsInput.value);
-    return Number.isFinite(fps) && fps > 0 ? fps : 30;
-  }
-  function getAmountSeconds() {
-    const value = Number(amount.value);
-    if (!Number.isFinite(value) || value <= 0) return NaN;
-    switch (unit.value) {
-      case 'frames': return Math.round(value) / getFps();
-      case 'minutes': return value * 60;
-      case 'hours': return value * 3600;
-      default: return value;
-    }
-  }
-  function targetPreviewTime() {
-    const duration = getDuration();
-    const length = getAmountSeconds();
-    if (!Number.isFinite(duration) || !Number.isFinite(length) || length <= 0) return NaN;
-    if (cuttingFrom === 'start') return Math.max(0, Math.min(duration, length - 1 / getFps()));
-    return Math.max(0, Math.min(duration, duration - length));
-  }
-  function syncModeButtons() {
-    startButton.classList.toggle('active', cuttingFrom === 'start');
-    endButton.classList.toggle('active', cuttingFrom === 'end');
-    startButton.setAttribute('aria-pressed', String(cuttingFrom === 'start'));
-    endButton.setAttribute('aria-pressed', String(cuttingFrom === 'end'));
-    previewNote.textContent = cuttingFrom === 'start'
-      ? '開始側の切り出し範囲で、最後に含めたいフレームをプレビュー。'
-      : '終了側の切り出し範囲で、最初に含めたいフレームをプレビュー。';
-  }
-  function updatePreview() {
-    syncModeButtons();
-    const t = targetPreviewTime();
-    if (!Number.isFinite(t)) {
-      previewStamp.textContent = 'プレビュー位置：--';
-      cutButton.disabled = true;
-      previewBlank.classList.remove('hidden');
-      previewBlank.textContent = selectedFile ? '動画の長さを取得中…' : '動画を選ぶと、切り出し位置のフレームをここに表示するよ。';
-      return;
-    }
-    previewStamp.textContent = `プレビュー位置：${fmtTime(t)} ／ 動画全体：${fmtTime(getDuration())}`;
-    if (nativePlayable && !nativeFailed) {
-      previewBlank.classList.add('hidden');
-      video.style.display = 'block';
-      previewImage.style.display = 'none';
-      try {
-        video.pause();
-        if (Math.abs(video.currentTime - t) > 0.005) video.currentTime = t;
-      } catch (_) {}
+  return NaN;
+}
+function activeFPS() {
+  const n = Number(els.fpsInput.value);
+  return Number.isFinite(n) && n > 0 ? n : (Number.isFinite(parsedFPS) && parsedFPS > 0 ? parsedFPS : 30);
+}
+function unitSeconds() {
+  const unit = els.unit.value;
+  if (unit === 'frames') return 1 / activeFPS();
+  if (unit === 'minutes') return 60;
+  if (unit === 'hours') return 3600;
+  return 1;
+}
+function getCutInfo() {
+  const count = Number(els.amount.value);
+  const unit = els.unit.value;
+  const validCount = els.amount.value.trim() !== '' && Number.isFinite(count) && count > 0;
+  const validDuration = Number.isFinite(sourceDuration) && sourceDuration > 0;
+  const fps = activeFPS();
+  const cutDuration = validCount ? (unit === 'frames' ? count / fps : count * unitSeconds()) : NaN;
+  const tooLong = validDuration && Number.isFinite(cutDuration) && cutDuration > sourceDuration + 0.0001;
+  let start = NaN, end = NaN, preview = NaN;
+  if (validDuration && Number.isFinite(cutDuration)) {
+    if (selectedSide === 'start') {
+      start = 0;
+      end = Math.min(sourceDuration, cutDuration);
+      preview = Math.max(0, Math.min(sourceDuration - Math.min(1/fps, sourceDuration), cutDuration - 1/fps));
     } else {
-      previewBlank.classList.remove('hidden');
-      previewBlank.textContent = ffmpegLoaded && sourceLoadedFor === selectedFile
-        ? '静止画プレビューを生成中…'
-        : 'この形式はブラウザで直接プレビューできないみたい。下の「FPSを自動検出」を押してエンジンを準備してね。';
-      if (ffmpegLoaded && sourceLoadedFor === selectedFile) queueFallbackPreview(t);
+      end = sourceDuration;
+      start = Math.max(0, sourceDuration - cutDuration);
+      preview = start;
     }
-    const length = getAmountSeconds();
-    const duration = getDuration();
-    const valid = selectedFile && Number.isFinite(length) && length > 0 && Number.isFinite(duration) && length <= duration + 0.001;
-    cutButton.disabled = !valid || busy;
+    preview = Math.max(0, Math.min(preview, Math.max(0, sourceDuration - 0.001)));
   }
-  function clearResult() {
-    result.style.display = 'none';
-    if (downloadURL) { URL.revokeObjectURL(downloadURL); downloadURL = null; }
-    downloadLink.removeAttribute('href');
+  return {count, unit, fps, cutDuration, start, end, preview, validCount, validDuration, tooLong};
+}
+function unitText(unit) {
+  return ({frames:'フレーム',seconds:'秒',minutes:'分',hours:'時間'})[unit] || unit;
+}
+function updateSummary() {
+  const info = getCutInfo();
+  els.fpsBox.classList.toggle('show', info.unit === 'frames');
+  if (!currentFile) {
+    els.cutSummary.textContent = '動画を選ぶと、切り抜く範囲を表示するよ。';
+    els.previewMeaning.textContent = 'プレビュー位置：未選択';
+    els.previewTime.textContent = '00:00:00.000';
+    els.cutButton.disabled = true;
+    return;
   }
-  function setSelectedFile(file) {
-    if (!file) return;
-    selectedFile = file;
-    durationFromFFmpeg = NaN;
-    nativePlayable = false;
-    nativeFailed = false;
-    sourceLoadedFor = null;
-    clearResult();
-    const extMatch = file.name.match(/\.([^.]+)$/);
-    const ext = extMatch ? extMatch[1].toLowerCase() : 'mkv';
-    const safeExt = /^[a-z0-9]{1,8}$/.test(ext) ? ext : 'mkv';
-    sourceName = `source.${safeExt}`;
-    const mimeMap = {mp4:'video/mp4',m4v:'video/mp4',mov:'video/quicktime',qt:'video/quicktime',webm:'video/webm',mkv:'video/x-matroska',avi:'video/x-msvideo',ogv:'video/ogg',ogg:'video/ogg',mpg:'video/mpeg',mpeg:'video/mpeg',ts:'video/mp2t',m2ts:'video/mp2t',mts:'video/mp2t','3gp':'video/3gpp'};
-    outputMime = mimeMap[safeExt] || 'application/octet-stream';
-    fileName.textContent = file.name;
-    fileDetails.textContent = `${fmtSize(file.size)} · ${file.type || '形式情報はブラウザ未判定'}`;
-    fileMeta.classList.remove('hidden');
-    previewBlank.classList.remove('hidden');
-    previewBlank.textContent = '動画の情報を読み込み中…';
-    video.style.display = 'block';
-    previewImage.style.display = 'none';
-    if (previewURL) URL.revokeObjectURL(previewURL);
-    previewURL = URL.createObjectURL(file);
-    video.pause();
-    video.removeAttribute('src');
-    video.src = previewURL;
-    video.load();
-    setBusy(false);
-    cutButton.disabled = true;
-    prepareButton.disabled = false;
-    progressBar.style.width = '0%';
-    setStatus('ファイルを選択したよ。数値を変えるとプレビュー位置が更新されるよ。');
-    updatePreview();
+  if (!info.validCount) {
+    els.cutSummary.innerHTML = '<span class="error">1以上の数値を入力してね。</span>';
+    els.cutButton.disabled = true;
+    return;
   }
-  function chooseFile(file) {
-    if (!file) return;
-    if (file.size > 1900 * 1024 * 1024) {
-      setStatus('このHTML版では約1.9GBを超えるファイルは安全のため処理対象外にしているよ。小さめのファイルで試してね。', 'bad');
-      return;
-    }
-    setSelectedFile(file);
+  if (!info.validDuration) {
+    els.cutSummary.textContent = '動画の長さを解析中…';
+    els.cutButton.disabled = true;
+    return;
   }
-
-  video.addEventListener('loadedmetadata', () => {
-    nativePlayable = Number.isFinite(video.duration) && video.duration > 0;
-    if (nativePlayable) {
-      previewBlank.classList.add('hidden');
-      fileDetails.textContent = `${fmtSize(selectedFile.size)} · 長さ ${fmtTime(video.duration)} · ${selectedFile.type || '動画'}`;
-    }
-    updatePreview();
-  });
-  video.addEventListener('seeked', () => {
-    if (nativePlayable && !nativeFailed) previewStamp.textContent = `プレビュー位置：${fmtTime(video.currentTime)} ／ 動画全体：${fmtTime(getDuration())}`;
-  });
-  video.addEventListener('error', () => {
-    nativeFailed = true;
-    nativePlayable = false;
-    video.style.display = 'none';
-    previewImage.style.display = 'block';
-    updatePreview();
-  });
-
-  fileInput.addEventListener('change', () => chooseFile(fileInput.files && fileInput.files[0]));
-  dropzone.addEventListener('click', (event) => { if (event.target !== fileInput) fileInput.click(); });
-  dropzone.addEventListener('keydown', (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); fileInput.click(); } });
-  dropzone.addEventListener('dragover', (event) => { event.preventDefault(); dropzone.classList.add('over'); });
-  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('over'));
-  dropzone.addEventListener('drop', (event) => { event.preventDefault(); dropzone.classList.remove('over'); chooseFile(event.dataTransfer && event.dataTransfer.files[0]); });
-  $('changeFile').addEventListener('click', () => fileInput.click());
-  startButton.addEventListener('click', () => { cuttingFrom = 'start'; updatePreview(); });
-  endButton.addEventListener('click', () => { cuttingFrom = 'end'; updatePreview(); });
-  amount.addEventListener('input', updatePreview);
-  amount.addEventListener('change', () => { if (unit.value === 'frames') amount.value = String(Math.max(1, Math.round(Number(amount.value) || 1))); updatePreview(); });
-  unit.addEventListener('change', () => { amount.step = unit.value === 'frames' ? '1' : 'any'; if (unit.value === 'frames') amount.value = String(Math.max(1, Math.round(Number(amount.value) || 1))); updatePreview(); });
-  fpsInput.addEventListener('input', updatePreview);
-
-  async function blobURLFrom(url, mimeType, label, stageStart, stageSpan, estimatedBytes) {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`読み込み失敗 (${response.status}): ${url}`);
-
-    const contentLengthHeader = response.headers.get('content-length');
-    const contentLength = contentLengthHeader ? Number(contentLengthHeader) : NaN;
-    const hasContentLength = Number.isFinite(contentLength) && contentLength > 0;
-    const reader = response.body && typeof response.body.getReader === 'function'
-      ? response.body.getReader()
-      : null;
-    let blob;
-
-    if (reader) {
-      const chunks = [];
-      let receivedBytes = 0;
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        if (value) {
-          chunks.push(value);
-          receivedBytes += value.byteLength;
+  const requested = info.unit === 'frames'
+    ? `${info.count} フレーム（約 ${fmtTime(info.cutDuration)}）`
+    : `${info.count} ${unitText(info.unit)}（${fmtTime(info.cutDuration)}）`;
+  const rangeText = `${fmtTime(info.start)} ～ ${fmtTime(info.end)}（動画全体 ${fmtTime(sourceDuration)}）`;
+  if (info.tooLong) {
+    els.cutSummary.innerHTML = `<span class="error">指定した長さが動画全体より長いよ。</span><div class="muted small" style="margin-top:5px">指定：${requested}<br>動画の長さ：${fmtTime(sourceDuration)}</div>`;
+    els.cutButton.disabled = true;
+  } else {
+    const modeText = selectedSide === 'start' ? '最初から切り出す末尾のフレーム' : '最後から切り出す先頭のフレーム';
+    els.cutSummary.innerHTML = `<div><strong>切り出し範囲</strong></div><div style="margin-top:5px">${rangeText}</div><div class="muted small" style="margin-top:5px">指定：${requested}</div><div class="muted small" style="margin-top:5px">プレビュー：${modeText}（${fmtTime(info.preview)}）</div>`;
+    els.cutButton.disabled = !engineLoaded || busy;
+  }
+  els.previewMeaning.textContent = selectedSide === 'start'
+    ? 'プレビュー：切り抜きに含まれる最後のフレーム'
+    : 'プレビュー：切り抜きに含まれる最初のフレーム';
+  els.previewTime.textContent = fmtTime(Number.isFinite(info.preview) ? info.preview : 0);
+  if (info.unit === 'frames') {
+    els.previewNote.textContent = `FPS ${fpsLabel()} を使って位置を計算。フレーム指定は動画のFPS判定に依存するよ。`;
+  } else {
+    els.previewNote.textContent = '数値を変えると、切り抜き範囲の端のフレームへプレビューが移動するよ。';
+  }
+}
+function fpsLabel() {
+  return Number.isFinite(Number(els.fpsInput.value)) && Number(els.fpsInput.value) > 0
+    ? `${Number(els.fpsInput.value)} FPS` : '30 FPS（仮）';
+}
+function seekNative(time) {
+  if (!nativePreviewAvailable || !Number.isFinite(time)) return false;
+  try {
+    els.video.pause();
+    const target = Math.max(0, Math.min(time, Math.max(0, els.video.duration - 0.001)));
+    if (Math.abs(els.video.currentTime - target) > 0.0005) els.video.currentTime = target;
+    els.video.hidden = false;
+    els.image.hidden = true;
+    els.previewEmpty.hidden = true;
+    return true;
+  } catch (_) { return false; }
+}
+function schedulePreview() {
+  updateSummary();
+  const info = getCutInfo();
+  if (!currentFile || !info.validDuration || !Number.isFinite(info.preview)) return;
+  const ticket = ++previewTicket;
+  if (nativePreviewAvailable && !nativePreviewFailed) {
+    seekNative(info.preview);
+    return;
+  }
+  pendingPreview = {ticket, time:info.preview};
+  clearTimeout(previewTimer);
+  previewTimer = setTimeout(() => { pumpPreview(); }, 280);
+}
+async function pumpPreview() {
+  if (previewPumpRunning || busy || nativePreviewAvailable || !engineLoaded || !currentInputName || !pendingPreview) return;
+  previewPumpRunning = true;
+  try {
+    while (pendingPreview && !busy && !nativePreviewAvailable) {
+      const item = pendingPreview;
+      pendingPreview = null;
+      if (item.ticket !== previewTicket) continue;
+      busy = true;
+      operation = 'preview';
+      try {
+        try { await ffmpeg.deleteFile('preview_frame.png'); } catch (_) {}
+        const args = ['-hide_banner'];
+        if (item.time > 0.001) args.push('-ss', item.time.toFixed(4));
+        args.push('-i', currentInputName, '-frames:v','1','-an','-f','image2','-y','preview_frame.png');
+        const code = await ffmpeg.exec(args);
+        if (code === 0 && item.ticket === previewTicket) {
+          const data = await ffmpeg.readFile('preview_frame.png');
+          if (previewObjectURL) URL.revokeObjectURL(previewObjectURL);
+          previewObjectURL = URL.createObjectURL(new Blob([data], {type:'image/png'}));
+          els.image.src = previewObjectURL;
+          els.image.hidden = false;
+          els.video.hidden = true;
+          els.previewEmpty.hidden = true;
         }
-
-        const ratio = hasContentLength
-          ? Math.min(0.995, receivedBytes / contentLength)
-          : Math.min(0.95, receivedBytes / Math.max(1, estimatedBytes));
-        const overallProgress = stageStart + stageSpan * ratio;
-        progressBar.style.width = `${Math.max(0, Math.min(99, overallProgress))}%`;
-        const byteText = hasContentLength
-          ? `${fmtSize(receivedBytes)} / ${fmtSize(contentLength)}`
-          : `${fmtSize(receivedBytes)} 受信済み`;
-        const percentText = hasContentLength
-          ? ` ${Math.min(99, Math.floor(receivedBytes / contentLength * 100))}%`
-          : '';
-        setStatus(`${label}をダウンロード中…${percentText}\n${byteText}`);
-      }
-      blob = new Blob(chunks, { type: mimeType });
-    } else {
-      setStatus(`${label}をダウンロード中… サイズを取得中`);
-      const buffer = await response.arrayBuffer();
-      blob = new Blob([buffer], { type: mimeType });
-    }
-
-    progressBar.style.width = `${Math.min(99, stageStart + stageSpan)}%`;
-    setStatus(`${label}のダウンロード完了（${fmtSize(blob.size)}）`);
-    const blobURL = URL.createObjectURL(blob);
-    objectURLs.push(blobURL);
-    return blobURL;
-  }
-  async function loadFFmpeg() {
-    if (ffmpegLoaded) return;
-    if (!window.FFmpegWASM || !window.FFmpegWASM.FFmpeg) {
-      throw new Error('FFmpeg本体のJavaScriptを読み込めなかったよ。ネット接続やCDNの状態を確認してね。');
-    }
-    progressBar.style.width = '0%';
-    setStatus('FFmpegエンジンを読み込み中… 初回は約30MB以上ダウンロードするよ。');
-    ffmpeg = new window.FFmpegWASM.FFmpeg();
-    ffmpeg.on('log', ({ message }) => {
-      if (message && /error|invalid|failed/i.test(message)) console.warn('[FFmpeg]', message);
-    });
-    ffmpeg.on('progress', ({ progress }) => {
-      if (Number.isFinite(progress)) progressBar.style.width = `${Math.max(0, Math.min(100, progress * 100))}%`;
-    });
-    const coreURL = await blobURLFrom(`${FFMPEG_BASE}/ffmpeg-core.js`, 'text/javascript', 'FFmpeg core JS', 0, 2, 250 * 1024);
-    const wasmURL = await blobURLFrom(`${FFMPEG_BASE}/ffmpeg-core.wasm`, 'application/wasm', 'FFmpeg WASM本体', 2, 95, 32 * 1024 * 1024);
-    const workerURL = await blobURLFrom(`${FFMPG_PACKAGE_BASE}/814.ffmpeg.js`, 'text/javascript', 'FFmpeg worker', 97, 2, 100 * 1024);
-    setStatus('FFmpeg本体を初期化中…');
-    progressBar.style.width = '99%';
-    await ffmpeg.load({ classWorkerURL: workerURL, coreURL, wasmURL });
-    ffmpegLoaded = true;
-    progressBar.style.width = '100%';
-  }
-  async function writeSelectedSource() {
-    if (!selectedFile) throw new Error('先に動画ファイルを選んでね。');
-    if (sourceLoadedFor === selectedFile) return;
-    setStatus('動画を端末内の処理領域へ読み込み中…');
-    try { await ffmpeg.deleteFile(sourceName); } catch (_) {}
-    const bytes = new Uint8Array(await selectedFile.arrayBuffer());
-    await ffmpeg.writeFile(sourceName, bytes);
-    sourceLoadedFor = selectedFile;
-  }
-  function parseProbe(logs) {
-    const all = logs.join('\n');
-    const durationMatch = all.match(/Duration:\s*(\d+):(\d+):(\d+(?:\.\d+)?)/i);
-    let duration = NaN;
-    if (durationMatch) duration = Number(durationMatch[1]) * 3600 + Number(durationMatch[2]) * 60 + Number(durationMatch[3]);
-    const videoLine = logs.find(line => /Video:/i.test(line)) || all;
-    const fpsMatch = videoLine.match(/([0-9]+(?:\.[0-9]+)?)\s*fps\b/i) || videoLine.match(/([0-9]+(?:\.[0-9]+)?)\s*tbr\b/i);
-    const fps = fpsMatch ? Number(fpsMatch[1]) : NaN;
-    return { duration, fps };
-  }
-  async function probeSource() {
-    const logs = [];
-    const handler = ({ message }) => { if (message) logs.push(message); };
-    ffmpeg.on('log', handler);
-    try { await ffmpeg.exec(['-hide_banner', '-i', sourceName]); } catch (_) { /* -iだけでは出力先がないため終了コードが非0になる */ }
-    // ラッパーのon APIは解除用offを提供する。
-    try { ffmpeg.off('log', handler); } catch (_) {}
-    return parseProbe(logs);
-  }
-  async function prepareEngine({ updateStatus = true } = {}) {
-    if (!selectedFile) throw new Error('先に動画ファイルを選んでね。');
-    if (selectedFile.size > 1900 * 1024 * 1024) throw new Error('ファイルが大きすぎるよ。約1.9GB以下のファイルで試してね。');
-    await loadFFmpeg();
-    await writeSelectedSource();
-    const probe = await probeSource();
-    if (Number.isFinite(probe.duration) && probe.duration > 0) durationFromFFmpeg = probe.duration;
-    if (Number.isFinite(probe.fps) && probe.fps > 0) {
-      fpsInput.value = String(probe.fps);
-      fpsNote.textContent = `FFmpegがFPSを検出：${probe.fps} FPS`;
-    } else {
-      fpsNote.textContent = 'FPSを自動検出できなかったため、必要なら手動で設定してね。';
-    }
-    updatePreview();
-    if (updateStatus) setStatus('エンジン準備完了。FPSと長さを確認してね。', 'good');
-  }
-
-  function queueFallbackPreview(time) {
-    const seq = ++fallbackSequence;
-    clearTimeout(fallbackTimer);
-    fallbackTimer = setTimeout(async () => {
-      if (!ffmpegLoaded || sourceLoadedFor !== selectedFile || busy) return;
-      try {
-        try { await ffmpeg.deleteFile('preview-frame.jpg'); } catch (_) {}
-        const seek = Math.max(0, Number(time)).toFixed(3);
-        const exitCode = await ffmpeg.exec(['-hide_banner', '-i', sourceName, '-ss', seek, '-frames:v', '1', '-vf', 'scale=960:-2', '-q:v', '4', 'preview-frame.jpg']);
-        if (seq !== fallbackSequence || exitCode !== 0) return;
-        const data = await ffmpeg.readFile('preview-frame.jpg');
-        if (seq !== fallbackSequence) return;
-        if (lastFallbackURL) URL.revokeObjectURL(lastFallbackURL);
-        lastFallbackURL = URL.createObjectURL(new Blob([data], { type: 'image/jpeg' }));
-        previewImage.src = lastFallbackURL;
-        previewImage.style.display = 'block';
-        video.style.display = 'none';
-        previewBlank.classList.add('hidden');
       } catch (error) {
-        if (seq === fallbackSequence) {
-          previewBlank.classList.remove('hidden');
-          previewBlank.textContent = 'この形式の静止画プレビューを作れなかったよ。切り出し自体は可能かもしれないので、試す場合は出力結果を確認してね。';
+        if (item.ticket === previewTicket) {
+          els.previewEmpty.hidden = false;
+          els.previewEmpty.textContent = 'この形式のプレビュー画像を作れなかったよ。切り抜き自体も対応していない可能性がある。';
+        }
+      } finally {
+        operation = '';
+        busy = false;
+        updateSummary();
+      }
+    }
+  } finally {
+    previewPumpRunning = false;
+    if (pendingPreview && !busy && !nativePreviewAvailable) pumpPreview();
+  }
+}
+async function ensureEngine() {
+  if (engineLoaded) return;
+  if (!ffmpeg) {
+    ffmpeg = new FFmpeg();
+    ffmpeg.on('log', ({message}) => {
+      if (operation === 'trim') {
+        const m = message.match(/time=(\d+):(\d+):(\d+(?:\.\d+)?)/);
+        if (m && currentCut && currentCut.duration > 0) {
+          const t = Number(m[1])*3600 + Number(m[2])*60 + Number(m[3]);
+          const relative = t > currentCut.start + 0.05 ? (t - currentCut.start) / currentCut.duration : t / currentCut.duration;
+          if (Number.isFinite(relative) && relative > 0 && relative < 1) {
+            setProgress(Math.max(5,Math.min(95,6+relative*88)), '切り抜き中…', '映像・音声を再エンコードせずコピー中');
+          }
         }
       }
-    }, 280);
+    });
+    ffmpeg.on('progress', ({progress}) => {
+      if (operation === 'trim' && Number.isFinite(progress) && progress > 0) {
+        setProgress(Math.max(5,Math.min(95,6+progress*88)), '切り抜き中…', '映像・音声を再エンコードせずコピー中');
+      }
+    });
   }
-
-  prepareButton.addEventListener('click', async () => {
-    if (!selectedFile || busy) return;
-    setBusy(true);
-    try { await prepareEngine({ updateStatus: true }); }
-    catch (error) { setStatus(`エンジン準備に失敗：${error.message || error}`, 'bad'); }
-    finally { setBusy(false); updatePreview(); }
-  });
-
-  cutButton.addEventListener('click', async () => {
-    if (!selectedFile || busy) return;
-    clearResult();
-    setBusy(true);
-    progressBar.style.width = '0%';
+  setProgress(4, '処理エンジンを読み込み中…', '初回は約31MBのダウンロードが発生するよ。');
+  const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/umd';
+  const [coreURL, wasmURL] = await Promise.all([
+    toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+    toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm')
+  ]);
+  await ffmpeg.load({coreURL, wasmURL});
+  engineLoaded = true;
+}
+async function loadSelectedFile(file) {
+  if (!file) return;
+  const previousInputName = currentInputName;
+  if (busy) {
+    alert('今の処理が終わってから、別のファイルを選んでね。');
+    return;
+  }
+  currentFile = file;
+  currentExt = extFromName(file.name);
+  currentInputName = `input_media.${currentExt}`;
+  sourceDuration = NaN;
+  parsedFPS = NaN;
+  userChangedFPS = false;
+  discoveredVideo = true;
+  nativePreviewAvailable = false;
+  nativePreviewFailed = false;
+  pendingPreview = null;
+  previewTicket++;
+  clearTimeout(previewTimer);
+  els.result.style.display = 'none';
+  els.fileMeta.style.display = 'flex';
+  els.fileName.textContent = file.name;
+  els.fileInfo.textContent = `${humanSize(file.size)} · .${currentExt}`;
+  setFileStatus('準備中');
+  els.previewEmpty.hidden = false;
+  els.previewEmpty.textContent = 'プレビューを準備中…';
+  els.video.hidden = true;
+  els.image.hidden = true;
+  els.cutButton.disabled = true;
+  if (currentObjectURL) URL.revokeObjectURL(currentObjectURL);
+  currentObjectURL = URL.createObjectURL(file);
+  els.video.removeAttribute('src');
+  els.video.load();
+  els.video.src = currentObjectURL;
+  els.video.load();
+  if (Number.isFinite(els.video.duration)) sourceDuration = els.video.duration;
+  updateSummary();
+  await prepareWithFFmpeg(file, previousInputName);
+}
+async function prepareWithFFmpeg(file, previousInputName = '') {
+  busy = true;
+  operation = 'prepare';
+  els.cutButton.disabled = true;
+  try {
+    await ensureEngine();
+    setProgress(56, 'ファイルをメモリに読み込み中…', `${humanSize(file.size)} をブラウザ内に読み込んでいるよ。`);
+    if (previousInputName && previousInputName !== currentInputName) { try { await ffmpeg.deleteFile(previousInputName); } catch (_) {} }
+    try { await ffmpeg.deleteFile(currentInputName); } catch (_) {}
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    await ffmpeg.writeFile(currentInputName, bytes);
+    setProgress(76, '動画情報を解析中…', '長さ・FPS・映像ストリームを確認中。');
+    const lines = [];
+    const logger = ({message}) => lines.push(message);
+    ffmpeg.on('log', logger);
     try {
-      await prepareEngine({ updateStatus: false });
-      const duration = getDuration();
-      const length = getAmountSeconds();
-      if (!Number.isFinite(length) || length <= 0) throw new Error('切り出す長さを0より大きい数値で入力してね。');
-      if (!Number.isFinite(duration) || duration <= 0) throw new Error('動画の長さを取得できなかったよ。');
-      if (length > duration + 0.001) throw new Error('指定した長さが動画全体より長いよ。数値を小さくしてね。');
-      const exactLength = Math.min(length, duration);
-      const outputExtMatch = selectedFile.name.match(/\.([^.]+)$/);
-      const ext = outputExtMatch ? outputExtMatch[1].toLowerCase() : 'mkv';
-      const safeExt = /^[a-z0-9]{1,8}$/.test(ext) ? ext : 'mkv';
-      const baseName = selectedFile.name.replace(/\.[^.]+$/, '') || 'video';
-      const suffix = cuttingFrom === 'start' ? '_from-start' : '_from-end';
-      const outputName = `cut-output${Date.now()}.${safeExt}`;
-      const args = ['-hide_banner', '-y'];
-      if (cuttingFrom === 'end') args.push('-sseof', `-${exactLength.toFixed(6)}`);
-      args.push('-i', sourceName, '-map', '0', '-c', 'copy');
-      if (cuttingFrom === 'start') args.push('-t', exactLength.toFixed(6));
-      args.push('-avoid_negative_ts', 'make_zero', outputName);
-      setStatus('無劣化で切り出し中… 再エンコードは行わないよ。');
-      const exitCode = await ffmpeg.exec(args);
-      if (exitCode !== 0) throw new Error(`FFmpegが終了コード ${exitCode} を返したよ。コンテナとコーデックの組み合わせが原因かもしれない。`);
-      const outputData = await ffmpeg.readFile(outputName);
-      const outputBlob = new Blob([outputData], { type: outputMime });
-      if (downloadURL) URL.revokeObjectURL(downloadURL);
-      downloadURL = URL.createObjectURL(outputBlob);
-      downloadLink.href = downloadURL;
-      downloadLink.download = `${baseName}${suffix}.${safeExt}`;
-      resultInfo.textContent = `完了 · ${fmtSize(outputBlob.size)} · 元のコンテナを維持して再エンコードなしで保存`;
-      result.style.display = 'block';
-      progressBar.style.width = '100%';
-      setStatus('切り出しが完了したよ！ ダウンロードリンクから保存してね。', 'good');
-      try { await ffmpeg.deleteFile(outputName); } catch (_) {}
-    } catch (error) {
-      setStatus(`切り出しに失敗：${error.message || error}`, 'bad');
+      // FFmpeg prints stream metadata before returning a nonzero code because no output was supplied.
+      try { await ffmpeg.exec(['-hide_banner','-i',currentInputName]); } catch (_) {}
     } finally {
-      setBusy(false);
-      updatePreview();
+      ffmpeg.off('log', logger);
     }
-  });
+    const logText = lines.join('\n');
+    const logDuration = durationFromLogs(logText);
+    const logFPS = fpsFromLogs(logText);
+    if (!Number.isFinite(sourceDuration) || sourceDuration <= 0) sourceDuration = logDuration;
+    if (Number.isFinite(logFPS) && logFPS > 0) {
+      parsedFPS = logFPS;
+      if (!userChangedFPS) els.fpsInput.value = String(Number(logFPS.toFixed(6)));
+      els.fpsStatus.textContent = `自動判定：${Number(logFPS.toFixed(3))} FPS`;
+      els.fpsStatus.style.color = 'var(--ok)';
+    } else {
+      els.fpsStatus.textContent = '判定できず（30 FPS仮）';
+      els.fpsStatus.style.color = 'var(--muted)';
+    }
+    discoveredVideo = /\bVideo:/i.test(logText);
+    if (!Number.isFinite(sourceDuration) || sourceDuration <= 0) {
+      throw new Error('動画の長さを読み取れなかったよ。このファイル形式は非対応かもしれない。');
+    }
+    if (!discoveredVideo) {
+      throw new Error('映像ストリームが見つからなかったよ。動画ファイルを選んでね。');
+    }
+    setFileStatus('準備完了','ok');
+    els.fileInfo.textContent = `${humanSize(file.size)} · ${fmtTime(sourceDuration)} · ${Number.isFinite(parsedFPS) ? parsedFPS.toFixed(3)+' FPS' : 'FPS未判定'}`;
+    finishProgress('準備完了', '切り抜きできるよ。');
+    updateSummary();
+    if (nativePreviewAvailable) schedulePreview();
+    else schedulePreview();
+    setTimeout(() => { if (!busy) els.progressWrap.style.display = 'none'; }, 1500);
+  } catch (error) {
+    console.error(error);
+    setFileStatus('解析エラー','warn');
+    setProgress(100,'読み込みに失敗',error && error.message ? error.message : String(error));
+    els.cutSummary.innerHTML = `<span class="error">読み込みに失敗したよ。</span><div class="muted small" style="margin-top:5px">${escapeHTML(error && error.message ? error.message : String(error))}</div>`;
+    els.cutButton.disabled = true;
+  } finally {
+    operation = '';
+    busy = false;
+    updateSummary();
+    if (pendingPreview) pumpPreview();
+  }
+}
+function escapeHTML(str) {
+  return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+async function performCut() {
+  const info = getCutInfo();
+  if (!currentFile || !engineLoaded || !info.validCount || !info.validDuration || info.tooLong || busy) return;
+  if (!discoveredVideo) { alert('映像ストリームが見つからないため、切り抜けないよ。'); return; }
+  busy = true;
+  operation = 'trim';
+  currentCut = {start:info.start,duration:info.cutDuration};
+  els.cutButton.disabled = true;
+  els.resetButton.disabled = true;
+  setProgress(5,'切り抜き中…','映像・音声を再エンコードせずコピー中',true);
+  els.result.style.display = 'none';
+  try {
+    const outName = `cut_output_${Date.now()}.${currentExt}`;
+    const args = ['-hide_banner'];
+    if (info.start > 0.001) args.push('-ss',info.start.toFixed(6));
+    args.push('-i',currentInputName,'-t',info.cutDuration.toFixed(6),'-map','0','-c','copy','-y');
+    if (['mp4','mov','m4v'].includes(currentExt)) args.push('-movflags','+faststart');
+    args.push(outName);
+    let code = await ffmpeg.exec(args);
+    if (code !== 0) {
+      // A container can contain auxiliary streams that are not supported in the chosen output muxer.
+      // Retry while preserving all video/audio streams, without re-encoding them.
+      try { await ffmpeg.deleteFile(outName); } catch (_) {}
+      const retry = ['-hide_banner'];
+      if (info.start > 0.001) retry.push('-ss',info.start.toFixed(6));
+      retry.push('-i',currentInputName,'-t',info.cutDuration.toFixed(6),'-map','0:v?','-map','0:a?','-c','copy','-y');
+      if (['mp4','mov','m4v'].includes(currentExt)) retry.push('-movflags','+faststart');
+      retry.push(outName);
+      setProgress(9,'出力形式を調整して再試行中…','映像・音声は引き続き再エンコードなし');
+      code = await ffmpeg.exec(retry);
+    }
+    if (code !== 0) throw new Error('FFmpegが切り抜きを完了できなかったよ。非対応コーデック／コンテナの可能性がある。');
+    setProgress(96,'切り抜き完了。ファイルを準備中…','出力ファイルをダウンロード用に準備しているよ。');
+    const data = await ffmpeg.readFile(outName);
+    const mime = currentFile.type || ({mp4:'video/mp4',mov:'video/quicktime',webm:'video/webm',mkv:'video/x-matroska',avi:'video/x-msvideo',m4v:'video/mp4',ogv:'video/ogg'}[currentExt] || 'application/octet-stream');
+    const blob = new Blob([data],{type:mime});
+    try { await ffmpeg.deleteFile(outName); } catch (_) {}
+    const base = currentFile.name.replace(/\.[^.]+$/,'') || 'video';
+    const suffix = selectedSide === 'start' ? 'from-start' : 'from-end';
+    const outputName = `${base}_cut-${suffix}.${currentExt}`;
+    if (currentOutputURL) URL.revokeObjectURL(currentOutputURL);
+    currentOutputURL = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = currentOutputURL;
+    a.download = outputName;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    finishProgress('完了！',`${outputName} · ${humanSize(blob.size)} · 再エンコードなし`);
+    els.result.style.display = 'block';
+    els.result.innerHTML = `<strong style="color:var(--ok)">✓ 切り抜き完了！</strong><div style="margin-top:5px">${escapeHTML(outputName)}（${humanSize(blob.size)}）</div><div class="small" style="margin-top:7px"><a href="${currentOutputURL}" download="${escapeHTML(outputName)}">ダウンロードをもう一度行う</a></div><div class="muted small" style="margin-top:7px">再エンコードなしで出力したよ。開始位置はキーフレームの影響を受ける場合がある点だけ注意してね。</div>`;
+  } catch (error) {
+    console.error(error);
+    setProgress(100,'切り抜きに失敗',error && error.message ? error.message : String(error));
+    els.result.style.display = 'block';
+    els.result.innerHTML = `<strong style="color:var(--danger)">切り抜きに失敗したよ</strong><div class="small" style="margin-top:5px">${escapeHTML(error && error.message ? error.message : String(error))}</div><div class="muted small" style="margin-top:5px">別のコンテナ形式や、ファイルサイズが小さい動画で試してみてね。</div>`;
+  } finally {
+    operation = '';
+    busy = false;
+    els.resetButton.disabled = false;
+    updateSummary();
+    if (pendingPreview) pumpPreview();
+    setTimeout(() => { if (!busy) els.progressWrap.style.display = 'none'; }, 4500);
+  }
+}
+function resetAll() {
+  if (busy) return;
+  currentFile = null;
+  sourceDuration = NaN;
+  parsedFPS = NaN;
+  currentInputName = '';
+  selectedSide = 'start';
+  userChangedFPS = false;
+  nativePreviewAvailable = false;
+  nativePreviewFailed = false;
+  pendingPreview = null;
+  previewTicket++;
+  clearTimeout(previewTimer);
+  els.fileInput.value = '';
+  els.fileMeta.style.display = 'none';
+  els.progressWrap.style.display = 'none';
+  els.video.pause();
+  els.video.removeAttribute('src');
+  els.video.load();
+  els.video.hidden = true;
+  els.image.hidden = true;
+  els.previewEmpty.hidden = false;
+  els.previewEmpty.textContent = '動画を選ぶと、切り抜き位置のフレームをここに表示するよ。';
+  els.fromStart.classList.add('active'); els.fromEnd.classList.remove('active');
+  els.fromStart.setAttribute('aria-pressed','true'); els.fromEnd.setAttribute('aria-pressed','false');
+  els.amount.value = '10'; els.unit.value = 'seconds'; els.fpsInput.value = '30';
+  els.fpsStatus.textContent = '未解析（仮に30 FPS）';
+  els.cutButton.disabled = true;
+  els.result.style.display = 'none';
+  if (currentObjectURL) URL.revokeObjectURL(currentObjectURL);
+  currentObjectURL = null;
+  if (previewObjectURL) URL.revokeObjectURL(previewObjectURL);
+  previewObjectURL = null;
+  if (currentOutputURL) URL.revokeObjectURL(currentOutputURL);
+  currentOutputURL = null;
+  updateSummary();
+}
 
-  window.addEventListener('beforeunload', () => {
-    if (previewURL) URL.revokeObjectURL(previewURL);
-    if (downloadURL) URL.revokeObjectURL(downloadURL);
-    if (lastFallbackURL) URL.revokeObjectURL(lastFallbackURL);
-    objectURLs.forEach(url => URL.revokeObjectURL(url));
-  });
-  setBusy(false);
-})();
+els.dropzone.addEventListener('click', () => els.fileInput.click());
+els.dropzone.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); els.fileInput.click(); } });
+els.fileInput.addEventListener('change', e => { const file = e.target.files && e.target.files[0]; if (file) loadSelectedFile(file); });
+els.dropzone.addEventListener('dragover', e => { e.preventDefault(); els.dropzone.classList.add('drag'); });
+els.dropzone.addEventListener('dragleave', () => els.dropzone.classList.remove('drag'));
+els.dropzone.addEventListener('drop', e => { e.preventDefault(); els.dropzone.classList.remove('drag'); const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (file) loadSelectedFile(file); });
+els.fromStart.addEventListener('click', () => { selectedSide='start'; els.fromStart.classList.add('active'); els.fromEnd.classList.remove('active'); els.fromStart.setAttribute('aria-pressed','true'); els.fromEnd.setAttribute('aria-pressed','false'); schedulePreview(); });
+els.fromEnd.addEventListener('click', () => { selectedSide='end'; els.fromEnd.classList.add('active'); els.fromStart.classList.remove('active'); els.fromEnd.setAttribute('aria-pressed','true'); els.fromStart.setAttribute('aria-pressed','false'); schedulePreview(); });
+els.amount.addEventListener('input', schedulePreview);
+els.unit.addEventListener('change', () => { els.amount.step = els.unit.value === 'frames' ? '1' : 'any'; if (els.unit.value === 'frames') els.amount.step='1'; schedulePreview(); });
+els.fpsInput.addEventListener('input', () => { userChangedFPS=true; els.fpsStatus.textContent='手動設定'; els.fpsStatus.style.color='var(--cyan)'; schedulePreview(); });
+els.cutButton.addEventListener('click', performCut);
+els.resetButton.addEventListener('click', resetAll);
+els.video.addEventListener('loadedmetadata', () => {
+  if (Number.isFinite(els.video.duration) && els.video.duration > 0) {
+    nativePreviewAvailable = true;
+    nativePreviewFailed = false;
+    if (!Number.isFinite(sourceDuration) || sourceDuration <= 0) sourceDuration = els.video.duration;
+    els.video.hidden = false;
+    els.image.hidden = true;
+    els.previewEmpty.hidden = true;
+    updateSummary();
+    schedulePreview();
+  }
+});
+els.video.addEventListener('error', () => {
+  nativePreviewAvailable = false;
+  nativePreviewFailed = true;
+  els.video.hidden = true;
+  els.image.hidden = true;
+  if (currentFile) {
+    els.previewEmpty.hidden = false;
+    els.previewEmpty.textContent = 'この形式はブラウザで直接再生できないため、静止画プレビューを試しているよ…';
+    schedulePreview();
+  }
+});
+els.video.addEventListener('seeked', () => {
+  // Keeping the timestamp derived from the requested cut avoids jitter from browser-specific seeking.
+});
+
+updateSummary();
 </script>
 </body>
 </html>
