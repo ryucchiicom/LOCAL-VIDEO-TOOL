@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="ja">
 <head>
@@ -188,6 +189,18 @@
     .info-button{height:34px;width:34px}
   }
   @media(max-width:380px){.file-info{display:none}.settings-layout{grid-template-columns:minmax(0,1fr) minmax(0,.78fr)}.file-name{max-width:22vw}}
+  .length-slider-wrap{margin-top:5px;min-width:0}
+  #amountSlider{display:block;width:100%;height:20px;margin:0;padding:0;background:transparent;accent-color:var(--cyan);cursor:pointer;touch-action:pan-y}
+  #amountSlider:disabled{opacity:.42;cursor:not-allowed}
+  .slider-labels{display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--muted);font-size:9px;line-height:1.1;margin-top:-1px}
+  .quicklook-overlay{position:fixed;z-index:1200;inset:0;background:#03060bf0;display:flex;align-items:center;justify-content:center;padding:14px;padding-bottom:max(14px,env(safe-area-inset-bottom))}
+  .quicklook-dialog{width:min(900px,100%);max-height:92dvh;overflow:auto;background:#111a27;border:1px solid #34445b;border-radius:16px;padding:12px;box-shadow:0 22px 70px #0009}
+  .quicklook-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;font-size:14px}
+  .quicklook-dialog video{display:block;width:100%;height:auto;max-height:68dvh;aspect-ratio:16/9;background:#05080d;object-fit:contain;border:1px solid #283548;border-radius:10px}
+  .quicklook-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .quicklook-download{color:#a5f0bf;font-size:12px;font-weight:800}
+  .result button{display:inline-flex;align-items:center;justify-content:center;gap:6px}
+  @media(max-height:650px){#amountSlider{height:17px}.slider-labels{font-size:8px}.length-slider-wrap{margin-top:2px}}
 
 </style>
 </head>
@@ -249,6 +262,10 @@
               <option value="hours">時間</option>
             </select>
           </div>
+          <div class="length-slider-wrap">
+            <input id="amountSlider" type="range" min="0" max="20" step="0.1" value="10" aria-label="切り出す長さを調整">
+            <div class="slider-labels"><span>0</span><span id="sliderMaxLabel">20 秒</span></div>
+          </div>
         </div>
         <div id="fpsBox" class="fps-box">
           <label class="label" for="fpsInput">フレームレート（FPS）</label>
@@ -292,10 +309,24 @@
     <p><strong>保存などの設定</strong></p>
     <ul>
       <li><strong>通常ダウンロード：</strong>切り抜いたファイルをダウンロードする。</li>
-      <li><strong>共有：</strong>処理完了後に表示される共有ボタンをタップすると、対応端末の共有シートが開くよ。</li>
-      <li><strong>クイックルック：</strong>処理完了後に表示されるボタンから別画面でファイルを開くよ。一般のWebページからiOSのQuick Lookアプリを直接呼び出すことはできないため、ブラウザのプレビュー表示になるよ。</li>
+      <li><strong>共有：</strong>処理完了後に表示される共有ボタンをタップすると、ブラウザが対応していれば端末の共有シートが開くよ。共有APIが使えない開き方では、保存リンクを使ってね。</li>
+      <li><strong>クイックルック：</strong>処理完了後にこの画面上で動画プレビューが開くよ。単体のHTMLからAppleのネイティブQuick Lookを直接呼び出すことはできないため、ブラウザ内のプレビューとして動作するよ。</li>
     </ul>
     <p>共有・プレビューはブラウザやファイル形式によって使えないことがあるよ。大きいファイルはメモリ不足で処理できない場合があるよ。</p>
+  </section>
+</div>
+
+<div id="quicklookOverlay" class="quicklook-overlay" hidden>
+  <section class="quicklook-dialog" role="dialog" aria-modal="true" aria-labelledby="quicklookTitle">
+    <div class="quicklook-head">
+      <strong id="quicklookTitle">クイックルック</strong>
+      <button id="quicklookClose" class="info-close" type="button" aria-label="閉じる">×</button>
+    </div>
+    <video id="quicklookVideo" controls playsinline preload="metadata"></video>
+    <div class="quicklook-footer">
+      <span id="quicklookFileInfo" class="muted small"></span>
+      <a id="quicklookDownload" class="quicklook-download" href="#" download>ファイルを保存</a>
+    </div>
   </section>
 </div>
 
@@ -309,7 +340,10 @@ const els = {
   video:$('previewVideo'), image:$('previewImage'), previewEmpty:$('previewEmpty'), previewMeaning:$('previewMeaning'), previewTime:$('previewTime'), previewNote:$('previewNote'),
   fromStart:$('fromStart'), fromEnd:$('fromEnd'), amount:$('amount'), unit:$('unit'), fpsBox:$('fpsBox'), fpsInput:$('fpsInput'), fpsStatus:$('fpsStatus'),
   cutSummary:$('cutSummary'), cutButton:$('cutButton'), resetButton:$('resetButton'), result:$('result'),
-  outputMode:$('outputMode'), infoButton:$('infoButton'), infoOverlay:$('infoOverlay'), infoClose:$('infoClose')
+  amountSlider:$('amountSlider'), sliderMaxLabel:$('sliderMaxLabel'),
+  outputMode:$('outputMode'), infoButton:$('infoButton'), infoOverlay:$('infoOverlay'), infoClose:$('infoClose'),
+  quicklookOverlay:$('quicklookOverlay'), quicklookVideo:$('quicklookVideo'), quicklookTitle:$('quicklookTitle'),
+  quicklookFileInfo:$('quicklookFileInfo'), quicklookDownload:$('quicklookDownload'), quicklookClose:$('quicklookClose')
 };
 
 let ffmpeg = null;
@@ -336,6 +370,7 @@ let currentCut = null;
 let discoveredVideo = false;
 let currentOutputBlob = null;
 let currentOutputName = '';
+let outputViewerWindow = null;
 const SETTINGS_KEY = 'losslessVideoCutterSettingsV1';
 
 function fmtTime(seconds) {
@@ -427,6 +462,43 @@ function getCutInfo() {
 }
 function unitText(unit) {
   return ({frames:'フレーム',seconds:'秒',minutes:'分',hours:'時間'})[unit] || unit;
+}
+function currentDurationInSelectedUnit() {
+  if (!Number.isFinite(sourceDuration) || sourceDuration <= 0) return NaN;
+  const secondsPerUnit = unitSeconds();
+  if (!Number.isFinite(secondsPerUnit) || secondsPerUnit <= 0) return NaN;
+  const units = sourceDuration / secondsPerUnit;
+  return els.unit.value === 'frames' ? Math.floor(units + 1e-7) : units;
+}
+function formatSliderValue(value) {
+  if (!Number.isFinite(value) || value < 0) value = 0;
+  const unit = els.unit.value;
+  const shown = unit === 'frames'
+    ? String(Math.floor(value + 1e-7))
+    : new Intl.NumberFormat('ja-JP', { maximumFractionDigits: 2 }).format(value);
+  return `${shown} ${unitText(unit)}`;
+}
+function syncAmountSlider(recenter = true) {
+  const rawAmount = Number(els.amount.value);
+  const amount = Number.isFinite(rawAmount) && rawAmount > 0 ? rawAmount : 0;
+  const durationUnits = currentDurationInSelectedUnit();
+  let max;
+  if (Number.isFinite(durationUnits) && durationUnits > 0) {
+    max = Math.min(durationUnits, Math.max(amount * 2, 0.01));
+  } else {
+    max = Math.max(amount * 2, 20);
+  }
+  if (els.unit.value === 'frames') {
+    max = Math.max(1, Math.floor(max));
+    els.amountSlider.step = '1';
+  } else {
+    els.amountSlider.step = '0.1';
+  }
+  els.amountSlider.min = '0';
+  els.amountSlider.max = String(max);
+  if (recenter) els.amountSlider.value = String(Math.min(amount, max));
+  els.amountSlider.disabled = !currentFile || !Number.isFinite(durationUnits) || durationUnits <= 0;
+  els.sliderMaxLabel.textContent = formatSliderValue(max);
 }
 function updateSummary() {
   const info = getCutInfo();
@@ -853,6 +925,7 @@ async function prepareWithFFmpeg(file, previousInputName = '') {
     setFileStatus('準備完了','ok');
     els.fileInfo.textContent = `${humanSize(file.size)} · ${fmtTime(sourceDuration)} · ${Number.isFinite(parsedFPS) ? parsedFPS.toFixed(3)+' FPS' : 'FPS未判定'}`;
     finishProgress('準備完了', '切り抜きできるよ。');
+    syncAmountSlider(true);
     updateSummary();
     if (nativePreviewAvailable) schedulePreview();
     else schedulePreview();
@@ -911,43 +984,108 @@ function triggerDownload(blob, filename) {
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
-async function shareCurrentOutput() {
+function showOutputMessage(message, kind = 'muted') {
+  const status = document.createElement('div');
+  status.className = `${kind} small`;
+  status.style.marginTop = '6px';
+  status.textContent = message;
+  els.result.appendChild(status);
+}
+function showShareFallback(message) {
+  showOutputMessage(message, 'error');
   if (!currentOutputBlob || !currentOutputName) return;
-  const file = new File([currentOutputBlob], currentOutputName, {type:currentOutputBlob.type || 'application/octet-stream'});
-  if (typeof navigator.share !== 'function' || typeof navigator.canShare !== 'function' || !navigator.canShare({files:[file]})) {
-    els.result.insertAdjacentHTML('beforeend', '<div class="muted small">このブラウザはファイル共有に対応していないため、通常ダウンロードを行うね。</div>');
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'secondary';
+  button.textContent = '動画を保存して共有する';
+  button.addEventListener('click', () => {
     triggerDownload(currentOutputBlob, currentOutputName);
+    showOutputMessage('保存を開始したよ。iPhoneなら「ファイル」アプリ、PCならダウンロード先から動画を開いて共有してね。');
+  });
+  els.result.appendChild(button);
+}
+async function shareCurrentOutput() {
+  if (!currentOutputBlob || !currentOutputName) {
+    showOutputMessage('共有する出力ファイルがまだないよ。', 'error');
     return;
   }
+  if (typeof navigator.share !== 'function') {
+    showShareFallback('このページの開き方では共有シートを直接呼び出せないよ。保存してから端末の共有メニューを使ってね。');
+    return;
+  }
+  let file;
   try {
-    await navigator.share({files:[file], title:currentOutputName});
-    const status = document.createElement('div');
-    status.className = 'muted small';
-    status.textContent = '共有シートを開いたよ。';
-    els.result.appendChild(status);
+    file = new File([currentOutputBlob], currentOutputName, {
+      type: currentOutputBlob.type || 'application/octet-stream',
+      lastModified: Date.now()
+    });
+  } catch (error) {
+    showShareFallback('このブラウザでは共有用ファイルを作成できなかったよ。保存して共有メニューを使ってね。');
+    return;
+  }
+  if (typeof navigator.canShare === 'function') {
+    let filesSupported = false;
+    try { filesSupported = navigator.canShare({ files: [file] }); } catch (_) {}
+    if (!filesSupported) {
+      showShareFallback('このブラウザでは動画ファイルの直接共有に対応していないみたい。保存してから共有してね。');
+      return;
+    }
+  }
+  try {
+    // Invoke the share API directly from the button click while the user activation is active.
+    await navigator.share({ files: [file], title: currentOutputName });
+    showOutputMessage('共有シートを開いたよ。');
   } catch (error) {
     if (error && error.name === 'AbortError') {
-      const status = document.createElement('div');
-      status.className = 'muted small';
-      status.textContent = '共有をキャンセルしたよ。';
-      els.result.appendChild(status);
+      showOutputMessage('共有をキャンセルしたよ。');
     } else {
-      const status = document.createElement('div');
-      status.className = 'muted small';
-      status.textContent = `共有できなかったよ：${error && error.message ? error.message : String(error)}`;
-      els.result.appendChild(status);
+      const message = error && error.message ? error.message : String(error);
+      showShareFallback(`共有シートを開けなかったよ（${message}）。保存してから端末の共有メニューを使ってね。`);
     }
   }
 }
-function openQuickLook() {
-  if (!currentOutputURL) return;
-  const opened = window.open(currentOutputURL, '_blank');
-  if (!opened) {
-    const status = document.createElement('div');
-    status.className = 'muted small';
-    status.textContent = '新しい画面がブロックされたよ。下のダウンロードリンクを使ってね。';
-    els.result.appendChild(status);
+function showQuickLookInPage() {
+  if (!currentOutputURL || !currentOutputBlob) {
+    showOutputMessage('プレビューできる出力ファイルがまだないよ。', 'error');
+    return;
   }
+  els.quicklookTitle.textContent = currentOutputName || 'クイックルック';
+  els.quicklookFileInfo.textContent = `${humanSize(currentOutputBlob.size)} · ${currentOutputBlob.type || '動画ファイル'}`;
+  els.quicklookVideo.pause();
+  els.quicklookVideo.src = currentOutputURL;
+  els.quicklookVideo.load();
+  els.quicklookDownload.href = currentOutputURL;
+  els.quicklookDownload.download = currentOutputName || 'video';
+  els.quicklookOverlay.hidden = false;
+}
+function openQuickLook() {
+  if (!currentOutputURL || !currentOutputBlob) {
+    showOutputMessage('プレビューできる出力ファイルがまだないよ。', 'error');
+    return;
+  }
+  // When a tab was opened synchronously from the Cut button, navigate that tab to the output.
+  // This avoids Safari blocking a new window after the asynchronous FFmpeg operation finishes.
+  if (outputViewerWindow && !outputViewerWindow.closed) {
+    try {
+      if (outputViewerWindow.location.href === 'about:blank') outputViewerWindow.location.replace(currentOutputURL);
+      outputViewerWindow.focus();
+      return;
+    } catch (_) {}
+  }
+  // On a direct user tap, try opening the actual output in the browser's native media viewer.
+  try {
+    const opened = window.open(currentOutputURL, '_blank');
+    if (opened) {
+      outputViewerWindow = opened;
+      return;
+    }
+  } catch (_) {}
+  // Popup-blocked browsers still get an in-page preview as a fallback.
+  showQuickLookInPage();
+}
+function closeQuickLook() {
+  els.quicklookVideo.pause();
+  els.quicklookOverlay.hidden = true;
 }
 function renderOutputResult(filename, blob, outputURL) {
   const mode = els.outputMode.value;
@@ -964,9 +1102,15 @@ function renderOutputResult(filename, blob, outputURL) {
   } else {
     els.result.innerHTML = `<strong style="color:var(--ok)">✓ 切り抜き完了！</strong><div>${escapeHTML(filename)}（${humanSize(blob.size)}）</div><button id="quicklookOutputButton" class="secondary" type="button">クイックルックで開く</button>${linkHTML}`;
     $('quicklookOutputButton').addEventListener('click', openQuickLook);
+    if (outputViewerWindow && !outputViewerWindow.closed) {
+      try { outputViewerWindow.location.replace(outputURL); } catch (_) { showQuickLookInPage(); }
+    } else {
+      // Native Quick Look cannot be invoked directly from a standalone HTML file.
+      // Use the built-in preview immediately when the browser blocked the reserved tab.
+      showQuickLookInPage();
+    }
   }
 }
-
 function escapeHTML(str) {
   return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
@@ -974,6 +1118,18 @@ async function performCut() {
   const info = getCutInfo();
   if (!currentFile || !engineLoaded || !info.validCount || !info.validDuration || info.tooLong || busy) return;
   if (!discoveredVideo) { alert('映像ストリームが見つからないため、切り抜けないよ。'); return; }
+  outputViewerWindow = null;
+  if (els.outputMode.value === 'quicklook') {
+    // Open a blank tab during the user's tap. Safari can block window.open after FFmpeg finishes.
+    try {
+      outputViewerWindow = window.open('about:blank', '_blank');
+      if (outputViewerWindow) {
+        outputViewerWindow.document.open();
+        outputViewerWindow.document.write('<!doctype html><html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>クイックルック</title><body style="margin:0;background:#080b11;color:#edf3fc;font:16px system-ui;display:grid;place-items:center;min-height:100vh"><p>切り抜き処理中… 完了したら動画を開くよ。</p></body></html>');
+        outputViewerWindow.document.close();
+      }
+    } catch (_) { outputViewerWindow = null; }
+  }
   busy = true;
   operation = 'trim';
   currentCut = {start:info.start,duration:info.cutDuration};
@@ -1065,11 +1221,15 @@ function resetAll() {
   currentOutputURL = null;
   currentOutputBlob = null;
   currentOutputName = '';
+  outputViewerWindow = null;
+  closeQuickLook();
+  syncAmountSlider(true);
   saveSettings();
   updateSummary();
 }
 
 restoreSettings();
+syncAmountSlider(true);
 els.dropzone.addEventListener('click', () => els.fileInput.click());
 els.dropzone.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); els.fileInput.click(); } });
 els.fileInput.addEventListener('change', e => { const file = e.target.files && e.target.files[0]; if (file) loadSelectedFile(file); });
@@ -1078,16 +1238,26 @@ els.dropzone.addEventListener('dragleave', () => els.dropzone.classList.remove('
 els.dropzone.addEventListener('drop', e => { e.preventDefault(); els.dropzone.classList.remove('drag'); const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (file) loadSelectedFile(file); });
 els.fromStart.addEventListener('click', () => { selectedSide='start'; els.fromStart.classList.add('active'); els.fromEnd.classList.remove('active'); els.fromStart.setAttribute('aria-pressed','true'); els.fromEnd.setAttribute('aria-pressed','false'); saveSettings(); schedulePreview(); });
 els.fromEnd.addEventListener('click', () => { selectedSide='end'; els.fromEnd.classList.add('active'); els.fromStart.classList.remove('active'); els.fromEnd.setAttribute('aria-pressed','true'); els.fromStart.setAttribute('aria-pressed','false'); saveSettings(); schedulePreview(); });
-els.amount.addEventListener('input', () => { saveSettings(); schedulePreview(); });
-els.unit.addEventListener('change', () => { els.amount.step = els.unit.value === 'frames' ? '1' : 'any'; saveSettings(); schedulePreview(); });
-els.fpsInput.addEventListener('input', () => { userChangedFPS=true; els.fpsStatus.textContent='手動設定'; els.fpsStatus.style.color='var(--cyan)'; saveSettings(); schedulePreview(); });
+els.amount.addEventListener('input', () => { syncAmountSlider(true); saveSettings(); schedulePreview(); });
+els.amount.addEventListener('change', () => { syncAmountSlider(true); saveSettings(); schedulePreview(); });
+els.amountSlider.addEventListener('input', () => {
+  const value = Number(els.amountSlider.value);
+  els.amount.value = els.unit.value === 'frames' ? String(Math.round(value)) : String(Number(value.toFixed(2)));
+  saveSettings();
+  schedulePreview();
+});
+els.amountSlider.addEventListener('change', () => { syncAmountSlider(true); saveSettings(); schedulePreview(); });
+els.unit.addEventListener('change', () => { els.amount.step = els.unit.value === 'frames' ? '1' : 'any'; syncAmountSlider(true); saveSettings(); schedulePreview(); });
+els.fpsInput.addEventListener('input', () => { userChangedFPS=true; els.fpsStatus.textContent='手動設定'; els.fpsStatus.style.color='var(--cyan)'; syncAmountSlider(true); saveSettings(); schedulePreview(); });
 els.outputMode.addEventListener('change', saveSettings);
 els.cutButton.addEventListener('click', performCut);
 els.resetButton.addEventListener('click', resetAll);
 els.infoButton.addEventListener('click', () => { els.infoOverlay.hidden = false; });
 els.infoClose.addEventListener('click', () => { els.infoOverlay.hidden = true; });
 els.infoOverlay.addEventListener('click', e => { if (e.target === els.infoOverlay) els.infoOverlay.hidden = true; });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') els.infoOverlay.hidden = true; });
+els.quicklookClose.addEventListener('click', closeQuickLook);
+els.quicklookOverlay.addEventListener('click', e => { if (e.target === els.quicklookOverlay) closeQuickLook(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { els.infoOverlay.hidden = true; closeQuickLook(); } });
 els.video.addEventListener('loadedmetadata', () => {
   if (Number.isFinite(els.video.duration) && els.video.duration > 0) {
     nativePreviewAvailable = true;
@@ -1096,6 +1266,7 @@ els.video.addEventListener('loadedmetadata', () => {
     els.video.hidden = false;
     els.image.hidden = true;
     els.previewEmpty.hidden = true;
+    syncAmountSlider(true);
     updateSummary();
     schedulePreview();
   }
