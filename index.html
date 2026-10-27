@@ -78,7 +78,7 @@
   /* Full-screen, no-page-scroll workspace */
   html,body{width:100%;height:100%;min-height:0;overflow:hidden;overscroll-behavior:none}
   body{min-height:0}
-  .wrap{width:100%;max-width:none;height:100vh;height:100dvh;margin:0;padding:max(7px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(7px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));display:grid;grid-template-rows:auto minmax(0,1.12fr) minmax(0,1fr) auto;gap:8px;overflow:hidden}
+  .wrap{width:100%;max-width:none;height:100vh;height:100dvh;margin:0;padding:max(7px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(7px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));display:grid;grid-template-rows:auto minmax(0,1.28fr) minmax(0,.92fr) auto;gap:8px;overflow:hidden}
   .app-header{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0;margin:0;min-height:40px}
   .brand{display:flex;align-items:center;gap:9px;min-width:0}
   .brand-copy{min-width:0}
@@ -99,7 +99,8 @@
   .preview-panel{display:flex;flex-direction:column;gap:0}
   .section-title{font-size:13px;margin:0 0 7px;gap:7px;line-height:1.2}
   .step{width:21px;height:21px;border-radius:7px;font-size:11px}
-  .preview-shell{flex:1;min-height:0;width:100%;aspect-ratio:auto;border-radius:10px}
+  .preview-shell{flex:1;min-height:0;min-width:0;width:100%;aspect-ratio:auto;border-radius:10px}
+  .preview-shell video,.preview-shell #previewImage{display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;object-position:center}
   .preview-shell.empty-pick{cursor:pointer}
   .preview-shell.drag{outline:2px dashed var(--cyan);outline-offset:-6px;background:#10272b}
   .preview-shell.drag::after{content:"ここにドロップして動画を差し替え";position:absolute;inset:12px;display:grid;place-items:center;background:#07121be8;border:1px solid #62e4dc99;border-radius:10px;color:#b2fff5;font-size:clamp(12px,2vw,18px);font-weight:800;pointer-events:none;text-align:center}
@@ -138,8 +139,7 @@
   .result button{font-size:11px;padding:6px 8px;margin-top:5px}
   .result a{font-size:11px}
   .bottom-actions{display:flex;align-items:center;gap:8px;min-height:44px}
-  .history-button{flex:none;min-width:0;width:38px;height:38px;padding:0;font-size:21px;display:grid;place-items:center}
-  #undoButton:disabled,#redoButton:disabled{opacity:.35}
+  .history-button{flex:none;min-width:0;width:40px;height:40px;padding:0;font-size:22px;line-height:1}
   #cutButton{flex:1;min-width:0;height:44px;padding:8px 12px;border-radius:12px;font-size:14px}
   .info-button{width:42px;height:42px;flex:none;border:1px solid #40516a;border-radius:50%;background:#152032;color:#dce9fb;font-weight:800;font-size:19px;display:grid;place-items:center;padding:0}
   .info-overlay{position:fixed;z-index:1000;inset:0;background:#03060bd9;display:flex;align-items:center;justify-content:center;padding:18px;padding-bottom:max(18px,env(safe-area-inset-bottom));}
@@ -153,7 +153,7 @@
   .info-dialog li{margin:5px 0}
   [hidden]{display:none!important}
   @media(max-width:600px){
-    .wrap{grid-template-rows:auto minmax(0,1.04fr) minmax(0,1fr) auto;gap:6px}
+    .wrap{grid-template-rows:auto minmax(0,1.12fr) minmax(0,.96fr) auto;gap:6px}
     .app-header{gap:5px;min-height:34px}
     .brand{gap:6px}
     .logo{width:29px;height:29px;min-width:29px;font-size:16px;border-radius:9px}
@@ -175,7 +175,7 @@
     .summary{font-size:10px;padding:7px}
     .bottom-actions{gap:6px;min-height:40px}
     #cutButton{height:40px;font-size:13px}
-    .history-button{width:32px;height:32px;font-size:19px;padding:0}
+    .history-button{width:34px;height:34px;padding:0;font-size:20px}
     .info-button{height:38px;width:38px;font-size:17px}
   }
   @media(max-height:650px){
@@ -267,7 +267,7 @@
             </select>
           </div>
           <div class="length-slider-wrap">
-            <input id="amountSlider" type="range" min="0" max="20" step="0.1" value="10" aria-label="切り出す長さを調整">
+            <input id="amountSlider" type="range" min="1" max="20" step="0.1" value="10" aria-label="切り出す長さを調整">
             <div class="slider-labels"><span>1</span><span id="sliderMaxLabel">20 秒</span></div>
           </div>
         </div>
@@ -298,7 +298,8 @@
   </section>
 
   <div class="bottom-actions">
-    <button id="undoButton" class="secondary history-button" type="button" aria-label="1つ戻る" title="1つ戻る" disabled>↩︎</button><button id="redoButton" class="secondary history-button" type="button" aria-label="1つやり直す" title="1つやり直す" disabled>↪︎</button>
+    <button id="undoButton" class="secondary history-button" type="button" aria-label="1つ戻す" title="1つ戻す" disabled>↩︎</button>
+    <button id="redoButton" class="secondary history-button" type="button" aria-label="1つやり直す" title="1つやり直す" disabled>↪︎</button>
     <button id="cutButton" class="primary" type="button" disabled>✂ 切り抜く</button>
     <button id="infoButton" class="info-button" type="button" aria-label="使い方と注意事項">i</button>
   </div>
@@ -335,8 +336,6 @@
 </div>
 
 <script type="module">
-import { FFmpeg } from 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js';
-
 const $ = (id) => document.getElementById(id);
 const els = {
   dropzone:$('dropzone'), fileInput:$('fileInput'), fileMeta:$('fileMeta'), fileName:$('fileName'), fileInfo:$('fileInfo'), fileStatus:$('fileStatus'),
@@ -351,6 +350,7 @@ const els = {
 };
 
 let ffmpeg = null;
+let FFmpegClass = null;
 let engineLoaded = false;
 let currentFile = null;
 let currentInputName = '';
@@ -375,10 +375,6 @@ let discoveredVideo = false;
 let currentOutputBlob = null;
 let currentOutputName = '';
 let outputViewerWindow = null;
-let undoHistory = [];
-let redoHistory = [];
-let lastHistoryState = null;
-let applyingHistory = false;
 const SETTINGS_KEY = 'losslessVideoCutterSettingsV1';
 
 function fmtTime(seconds) {
@@ -487,12 +483,13 @@ function formatSliderValue(value) {
   return `${shown} ${unitText(unit)}`;
 }
 function syncAmountSlider(recenter = true) {
+  els.amount.min = '1';
   const rawAmount = Number(els.amount.value);
   const amount = Number.isFinite(rawAmount) && rawAmount > 0 ? rawAmount : 0;
   const durationUnits = currentDurationInSelectedUnit();
   let max;
   if (Number.isFinite(durationUnits) && durationUnits > 0) {
-    max = Math.min(durationUnits, Math.max(amount * 2, 0.01));
+    max = Math.max(1, Math.min(durationUnits, Math.max(amount * 2, 1)));
   } else {
     max = Math.max(amount * 2, 20);
   }
@@ -504,8 +501,7 @@ function syncAmountSlider(recenter = true) {
   }
   els.amountSlider.min = '1';
   els.amountSlider.max = String(max);
-  if (recenter) els.amountSlider.value = String(Math.max(1, Math.min(amount, max)));
-  if (Number(els.amountSlider.max) < 1) els.amountSlider.max = '1';
+  if (recenter) els.amountSlider.value = String(Math.min(amount, max));
   els.amountSlider.disabled = !currentFile || !Number.isFinite(durationUnits) || durationUnits <= 0;
   els.sliderMaxLabel.textContent = formatSliderValue(max);
 }
@@ -618,7 +614,8 @@ async function pumpPreview() {
   }
 }
 function createFFmpegInstance() {
-  const instance = new FFmpeg();
+  if (typeof FFmpegClass !== 'function') throw new Error('FFmpegのライブラリを読み込めていないよ。');
+  const instance = new FFmpegClass();
   instance.on('log', ({message}) => {
     if (operation === 'trim') {
       const m = message.match(/time=(\d+):(\d+):(\d+(?:\.\d+)?)/);
@@ -800,41 +797,85 @@ self.onmessage = async event => {
   return URL.createObjectURL(new Blob([workerSource], { type: 'text/javascript' }));
 }
 
+async function loadFFmpegClass() {
+  if (typeof FFmpegClass === 'function') return FFmpegClass;
+  const moduleSources = [
+    {name:'jsDelivr', url:'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js'},
+    {name:'jsDelivr Fastly', url:'https://fastly.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js'},
+    {name:'jsDelivr Gcore', url:'https://gcore.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js'},
+    {name:'unpkg', url:'https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js'}
+  ];
+  const failures = [];
+  for (const source of moduleSources) {
+    try {
+      setProgress(3, '処理エンジンを読み込み中…', `${source.name} からライブラリを読み込んでいるよ。`, true);
+      const module = await withTimeout(
+        import(source.url),
+        45000,
+        `${source.name} のライブラリ読み込みが45秒で完了しなかったよ。`
+      );
+      if (!module || typeof module.FFmpeg !== 'function') throw new Error('FFmpegクラスが見つからなかったよ。');
+      FFmpegClass = module.FFmpeg;
+      return FFmpegClass;
+    } catch (error) {
+      console.error(`${source.name} FFmpeg library load failed:`, error);
+      failures.push(`${source.name}：${error && error.message ? error.message : String(error)}`);
+    }
+  }
+  throw new Error(`FFmpegライブラリを読み込めなかったよ。ネット接続やブラウザの拡張機能を確認してね。\n${failures.join('\n')}`);
+}
+
 async function ensureEngine() {
   if (engineLoaded) return;
+  await loadFFmpegClass();
   const sources = [
-    {name:'jsDelivr', base:'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist'},
-    {name:'unpkg', base:'https://unpkg.com/@ffmpeg/core@0.12.10/dist'}
+    {name:'jsDelivr', base:'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm'},
+    {name:'jsDelivr Fastly', base:'https://fastly.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm'},
+    {name:'jsDelivr Gcore', base:'https://gcore.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm'},
+    {name:'unpkg', base:'https://unpkg.com/@ffmpeg/core@0.12.10/dist/esm'}
   ];
   const failures = [];
   for (const source of sources) {
+    let coreURL = null;
     let wasmURL = null;
     let classWorkerURL = null;
     try {
       setProgress(4, '処理エンジンを読み込み中…', `${source.name} に接続中…`, true);
+      coreURL = await downloadBlobURL(
+        `${source.base}/ffmpeg-core.js`,
+        'text/javascript',
+        (percent, received, total) => {
+          const detail = total > 0
+            ? `${source.name}：コア ${humanSize(received)} / ${humanSize(total)}`
+            : `${source.name}：コアをダウンロード中…`;
+          setProgress(4 + percent * 0.025, '処理エンジンをダウンロード中…', detail);
+        },
+        45000,
+        120000
+      );
       wasmURL = await downloadBlobURL(
-        `${source.base}/esm/ffmpeg-core.wasm`,
+        `${source.base}/ffmpeg-core.wasm`,
         'application/wasm',
         (percent, received, total) => {
           const detail = total > 0
             ? `${source.name}：本体 ${humanSize(received)} / ${humanSize(total)}`
             : `${source.name}：本体をダウンロード中…`;
-          setProgress(5 + percent * 0.47, '処理エンジンをダウンロード中…', detail);
+          setProgress(7 + percent * 0.45, '処理エンジンをダウンロード中…', detail);
         },
-        60000,
-        32000000
+        180000,
+        34000000
       );
       classWorkerURL = createFFmpegWorkerURL();
       setProgress(54, '処理エンジンを起動中…', 'ダウンロード完了。ブラウザ内でFFmpegを準備しているよ。', true);
       ffmpeg = createFFmpegInstance();
-      const coreURL = `${source.base}/esm/ffmpeg-core.js`;
       await withTimeout(
         ffmpeg.load({classWorkerURL, coreURL, wasmURL}),
-        45000,
-        '処理エンジンの起動が45秒で完了しなかったよ。ブラウザがWorker／WebAssemblyを制限しているか、配信元に接続できていない可能性がある。'
+        90000,
+        '処理エンジンの起動が90秒で完了しなかったよ。ブラウザがWorker／WebAssemblyを制限しているか、配信元に接続できていない可能性がある。'
       );
       engineLoaded = true;
       if (classWorkerURL) { URL.revokeObjectURL(classWorkerURL); classWorkerURL = null; }
+      if (coreURL) { URL.revokeObjectURL(coreURL); coreURL = null; }
       if (wasmURL) { URL.revokeObjectURL(wasmURL); wasmURL = null; }
       setProgress(56, '処理エンジンの準備完了', '動画ファイルを読み込んでいるよ。');
       return;
@@ -846,11 +887,12 @@ async function ensureEngine() {
         ffmpeg = null;
       }
       if (classWorkerURL) URL.revokeObjectURL(classWorkerURL);
+      if (coreURL) URL.revokeObjectURL(coreURL);
       if (wasmURL) URL.revokeObjectURL(wasmURL);
       setProgress(4, '別の配信元を試しているよ…', failures[failures.length - 1], true);
     }
   }
-  throw new Error(`処理エンジンを読み込めなかったよ。ネット接続を確認して再試行してね。\n${failures.join('\n')}`);
+  throw new Error(`処理エンジンを読み込めなかったよ。ネット接続やブラウザの拡張機能を確認して再試行してね。\n${failures.join('\n')}`);
 }
 function updatePreviewPickState() {
   const empty = !currentFile;
@@ -977,12 +1019,77 @@ function saveSettings() {
     console.warn('設定を保存できなかったよ:', error);
   }
 }
+const undoHistory = [];
+const redoHistory = [];
+let lastHistoryState = null;
+function readSettingsState() {
+  return {
+    selectedSide,
+    amount: els.amount.value,
+    unit: els.unit.value,
+    fpsInput: els.fpsInput.value,
+    userChangedFPS,
+    outputMode: els.outputMode.value
+  };
+}
+function sameSettingsState(a, b) {
+  return !!a && !!b && a.selectedSide === b.selectedSide && a.amount === b.amount &&
+    a.unit === b.unit && a.fpsInput === b.fpsInput && a.userChangedFPS === b.userChangedFPS &&
+    a.outputMode === b.outputMode;
+}
+function updateHistoryButtons() {
+  els.undoButton.disabled = busy || undoHistory.length === 0;
+  els.redoButton.disabled = busy || redoHistory.length === 0;
+}
+function commitSettingsHistory() {
+  const next = readSettingsState();
+  if (lastHistoryState && !sameSettingsState(lastHistoryState, next)) {
+    undoHistory.push(lastHistoryState);
+    if (undoHistory.length > 100) undoHistory.shift();
+    redoHistory.length = 0;
+  }
+  lastHistoryState = next;
+  updateHistoryButtons();
+}
+function applySettingsState(state) {
+  if (!state || busy) return;
+  selectedSide = state.selectedSide;
+  els.amount.value = state.amount;
+  els.unit.value = state.unit;
+  els.fpsInput.value = state.fpsInput;
+  userChangedFPS = state.userChangedFPS;
+  els.outputMode.value = state.outputMode;
+  const isStart = selectedSide === 'start';
+  els.fromStart.classList.toggle('active', isStart);
+  els.fromEnd.classList.toggle('active', !isStart);
+  els.fromStart.setAttribute('aria-pressed', String(isStart));
+  els.fromEnd.setAttribute('aria-pressed', String(!isStart));
+  els.amount.step = els.unit.value === 'frames' ? '1' : 'any';
+  els.fpsStatus.textContent = userChangedFPS ? '手動設定' : (Number.isFinite(parsedFPS) ? `自動判定：${Number(parsedFPS.toFixed(3))} FPS` : '未解析（仮に30 FPS）');
+  syncAmountSlider(true);
+  saveSettings();
+  updateSummary();
+  schedulePreview();
+  lastHistoryState = readSettingsState();
+  updateHistoryButtons();
+}
+function undoSettings() {
+  if (busy || undoHistory.length === 0) return;
+  redoHistory.push(readSettingsState());
+  applySettingsState(undoHistory.pop());
+}
+function redoSettings() {
+  if (busy || redoHistory.length === 0) return;
+  undoHistory.push(readSettingsState());
+  applySettingsState(redoHistory.pop());
+}
+
 function restoreSettings() {
   let saved = null;
   try { saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || 'null'); } catch (_) {}
   if (!saved || typeof saved !== 'object') return;
   if (saved.selectedSide === 'start' || saved.selectedSide === 'end') selectedSide = saved.selectedSide;
-  if (typeof saved.amount === 'string' && saved.amount.trim() !== '' && Number.isFinite(Number(saved.amount)) && Number(saved.amount) > 0) els.amount.value = saved.amount;
+  if (typeof saved.amount === 'string' && saved.amount.trim() !== '' && Number.isFinite(Number(saved.amount)) && Number(saved.amount) >= 1) els.amount.value = saved.amount;
   if (['frames','seconds','minutes','hours'].includes(saved.unit)) els.unit.value = saved.unit;
   if (typeof saved.fpsInput === 'string' && Number.isFinite(Number(saved.fpsInput)) && Number(saved.fpsInput) > 0 && Number(saved.fpsInput) <= 1000) els.fpsInput.value = saved.fpsInput;
   userChangedFPS = saved.userChangedFPS === true;
@@ -1158,7 +1265,8 @@ async function performCut() {
   operation = 'trim';
   currentCut = {start:info.start,duration:info.cutDuration};
   els.cutButton.disabled = true;
-  els.undoButton.disabled = true; els.redoButton.disabled = true;
+  els.undoButton.disabled = true;
+  els.redoButton.disabled = true;
   setProgress(5,'切り抜き中…','映像・音声を再エンコードせずコピー中',true);
   els.result.style.display = 'none';
   try {
@@ -1202,80 +1310,61 @@ async function performCut() {
   } finally {
     operation = '';
     busy = false;
-    refreshHistoryButtons();
+    updateHistoryButtons();
     updateSummary();
     if (pendingPreview) pumpPreview();
     setTimeout(() => { if (!busy) els.progressWrap.style.display = 'none'; }, 4500);
   }
 }
-function captureHistoryState() {
-  return {
-    selectedSide,
-    amount: els.amount.value,
-    unit: els.unit.value,
-    fpsInput: els.fpsInput.value,
-    userChangedFPS,
-    outputMode: els.outputMode.value
-  };
-}
-function sameHistoryState(a, b) {
-  return !!a && !!b && Object.keys(a).every(key => a[key] === b[key]);
-}
-function refreshHistoryButtons() {
-  els.undoButton.disabled = busy || undoHistory.length === 0;
-  els.redoButton.disabled = busy || redoHistory.length === 0;
-}
-function recordHistoryChange() {
-  if (applyingHistory) return;
-  const next = captureHistoryState();
-  if (lastHistoryState && !sameHistoryState(lastHistoryState, next)) {
-    undoHistory.push(lastHistoryState);
-    if (undoHistory.length > 100) undoHistory.shift();
-    redoHistory = [];
-  }
-  lastHistoryState = next;
-  refreshHistoryButtons();
-}
-function applyHistoryState(state) {
-  if (!state || busy) return;
-  applyingHistory = true;
-  selectedSide = state.selectedSide;
-  els.amount.value = state.amount;
-  els.unit.value = state.unit;
-  els.fpsInput.value = state.fpsInput;
-  userChangedFPS = state.userChangedFPS;
-  els.outputMode.value = state.outputMode;
-  const isStart = selectedSide === 'start';
-  els.fromStart.classList.toggle('active', isStart);
-  els.fromEnd.classList.toggle('active', !isStart);
-  els.fromStart.setAttribute('aria-pressed', String(isStart));
-  els.fromEnd.setAttribute('aria-pressed', String(!isStart));
-  els.amount.step = els.unit.value === 'frames' ? '1' : 'any';
-  els.fpsStatus.textContent = userChangedFPS ? '手動設定' : '未解析（仮に30 FPS）';
-  els.fpsStatus.style.color = userChangedFPS ? 'var(--cyan)' : '';
+function resetAll() {
+  if (busy) return;
+  currentFile = null;
+  updatePreviewPickState();
+  sourceDuration = NaN;
+  parsedFPS = NaN;
+  currentInputName = '';
+  selectedSide = 'start';
+  userChangedFPS = false;
+  nativePreviewAvailable = false;
+  nativePreviewFailed = false;
+  pendingPreview = null;
+  previewTicket++;
+  clearTimeout(previewTimer);
+  els.fileInput.value = '';
+  els.fileMeta.style.display = 'none';
+  els.progressWrap.style.display = 'none';
+  els.video.pause();
+  els.video.removeAttribute('src');
+  els.video.load();
+  els.video.hidden = true;
+  els.image.hidden = true;
+  els.previewEmpty.hidden = false;
+  els.previewEmpty.innerHTML = 'タップして動画を選択<br>または動画をドラッグ＆ドロップ';
+  els.fromStart.classList.add('active'); els.fromEnd.classList.remove('active');
+  els.fromStart.setAttribute('aria-pressed','true'); els.fromEnd.setAttribute('aria-pressed','false');
+  els.amount.value = '10'; els.unit.value = 'seconds'; els.fpsInput.value = '30'; els.outputMode.value = 'download'; userChangedFPS = false;
+  els.fpsStatus.textContent = '未解析（仮に30 FPS）';
+  els.cutButton.disabled = true;
+  els.result.style.display = 'none';
+  if (currentObjectURL) URL.revokeObjectURL(currentObjectURL);
+  currentObjectURL = null;
+  if (previewObjectURL) URL.revokeObjectURL(previewObjectURL);
+  previewObjectURL = null;
+  if (currentOutputURL) URL.revokeObjectURL(currentOutputURL);
+  currentOutputURL = null;
+  currentOutputBlob = null;
+  currentOutputName = '';
+  outputViewerWindow = null;
+  closeQuickLook();
   syncAmountSlider(true);
   saveSettings();
   updateSummary();
-  schedulePreview();
-  lastHistoryState = captureHistoryState();
-  applyingHistory = false;
-  refreshHistoryButtons();
-}
-function undoOne() {
-  if (busy || !undoHistory.length) return;
-  redoHistory.push(captureHistoryState());
-  applyHistoryState(undoHistory.pop());
-}
-function redoOne() {
-  if (busy || !redoHistory.length) return;
-  undoHistory.push(captureHistoryState());
-  applyHistoryState(redoHistory.pop());
 }
 
 restoreSettings();
+lastHistoryState = readSettingsState();
+updateHistoryButtons();
 syncAmountSlider(true);
-lastHistoryState = captureHistoryState();
-refreshHistoryButtons();
 updatePreviewPickState();
 els.dropzone.addEventListener('click', () => els.fileInput.click());
 els.dropzone.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); els.fileInput.click(); } });
@@ -1310,24 +1399,24 @@ els.previewShell.addEventListener('drop', e => {
   const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
   if (file) loadSelectedFile(file);
 });
-els.fromStart.addEventListener('click', () => { selectedSide='start'; els.fromStart.classList.add('active'); els.fromEnd.classList.remove('active'); els.fromStart.setAttribute('aria-pressed','true'); els.fromEnd.setAttribute('aria-pressed','false'); recordHistoryChange(); saveSettings(); schedulePreview(); });
-els.fromEnd.addEventListener('click', () => { selectedSide='end'; els.fromEnd.classList.add('active'); els.fromStart.classList.remove('active'); els.fromEnd.setAttribute('aria-pressed','true'); els.fromStart.setAttribute('aria-pressed','false'); recordHistoryChange(); saveSettings(); schedulePreview(); });
-els.amount.addEventListener('input', () => { syncAmountSlider(true); recordHistoryChange(); saveSettings(); schedulePreview(); });
-els.amount.addEventListener('change', () => { syncAmountSlider(true); recordHistoryChange(); saveSettings(); schedulePreview(); });
+els.fromStart.addEventListener('click', () => { selectedSide='start'; els.fromStart.classList.add('active'); els.fromEnd.classList.remove('active'); els.fromStart.setAttribute('aria-pressed','true'); els.fromEnd.setAttribute('aria-pressed','false'); saveSettings(); commitSettingsHistory(); schedulePreview(); });
+els.fromEnd.addEventListener('click', () => { selectedSide='end'; els.fromEnd.classList.add('active'); els.fromStart.classList.remove('active'); els.fromEnd.setAttribute('aria-pressed','true'); els.fromStart.setAttribute('aria-pressed','false'); saveSettings(); commitSettingsHistory(); schedulePreview(); });
+els.amount.addEventListener('input', () => { syncAmountSlider(true); saveSettings(); schedulePreview(); });
+els.amount.addEventListener('change', () => { const n = Number(els.amount.value); if (!Number.isFinite(n) || n < 1) els.amount.value = '1'; syncAmountSlider(true); saveSettings(); commitSettingsHistory(); schedulePreview(); });
 els.amountSlider.addEventListener('input', () => {
   const value = Number(els.amountSlider.value);
   els.amount.value = els.unit.value === 'frames' ? String(Math.round(value)) : String(Number(value.toFixed(2)));
-  recordHistoryChange();
   saveSettings();
   schedulePreview();
 });
-els.amountSlider.addEventListener('change', () => { syncAmountSlider(true); saveSettings(); schedulePreview(); });
-els.unit.addEventListener('change', () => { els.amount.step = els.unit.value === 'frames' ? '1' : 'any'; syncAmountSlider(true); recordHistoryChange(); saveSettings(); schedulePreview(); });
-els.fpsInput.addEventListener('input', () => { userChangedFPS=true; els.fpsStatus.textContent='手動設定'; els.fpsStatus.style.color='var(--cyan)'; syncAmountSlider(true); recordHistoryChange(); saveSettings(); schedulePreview(); });
-els.outputMode.addEventListener('change', () => { recordHistoryChange(); saveSettings(); });
+els.amountSlider.addEventListener('change', () => { syncAmountSlider(true); saveSettings(); commitSettingsHistory(); schedulePreview(); });
+els.unit.addEventListener('change', () => { els.amount.step = els.unit.value === 'frames' ? '1' : 'any'; syncAmountSlider(true); saveSettings(); commitSettingsHistory(); schedulePreview(); });
+els.fpsInput.addEventListener('input', () => { userChangedFPS=true; els.fpsStatus.textContent='手動設定'; els.fpsStatus.style.color='var(--cyan)'; syncAmountSlider(true); saveSettings(); schedulePreview(); });
+els.fpsInput.addEventListener('change', commitSettingsHistory);
+els.outputMode.addEventListener('change', () => { saveSettings(); commitSettingsHistory(); });
 els.cutButton.addEventListener('click', performCut);
-els.undoButton.addEventListener('click', undoOne);
-els.redoButton.addEventListener('click', redoOne);
+els.undoButton.addEventListener('click', undoSettings);
+els.redoButton.addEventListener('click', redoSettings);
 els.infoButton.addEventListener('click', () => { els.infoOverlay.hidden = false; });
 els.infoClose.addEventListener('click', () => { els.infoOverlay.hidden = true; });
 els.infoOverlay.addEventListener('click', e => { if (e.target === els.infoOverlay) els.infoOverlay.hidden = true; });
